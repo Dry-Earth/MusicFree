@@ -449,5 +449,11 @@
     "dialog.checkStorage.button.openAppSettings": "開啟應用程式設定",
     "fileSelector.storagePermissionTip": "未授予檔案存取權限，目前僅顯示應用程式專屬目錄。",
     "fileSelector.grantPermission": "去授權",
-    "fileSelector.appPrivateDir": "應用程式目錄"
+    "fileSelector.appPrivateDir": "應用程式目錄",
+    "basicSettings.autoStartOnBoot": "開機自動啟動（需車機允許）",
+    "basicSettings.openDefaultAppsSettings": "開啟系統預設應用程式設定",
+    "basicSettings.defaultMusicHint": "預設音樂：部分 DiLink 版本需在「小迪設定 → 音樂」中選擇；第三方 App 無法自行設為預設。",
+    "toast.voiceNoPlugin": "沒有可用的搜尋外掛，請先安裝並啟用外掛",
+    "toast.voicePlaying": "正在播放：{name}",
+    "toast.voiceNoResult": "沒有找到「{query}」"
 }

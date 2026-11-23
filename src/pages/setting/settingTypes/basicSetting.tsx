@@ -12,6 +12,7 @@ import { useI18N } from "@/core/i18n";
 import { ROUTE_PATH, useNavigate } from "@/core/router";
 import useColors from "@/hooks/useColors";
 import LyricUtil, { NativeTextAlignment } from "@/native/lyricUtil";
+import NativeUtils from "@/native/utils";
 import { AppConfigPropertyKey } from "@/types/core/config";
 import { clearCache, getCacheSize, sizeFormatter } from "@/utils/fileUtils";
 import { clearLog, getErrorLogContent } from "@/utils/log";
@@ -132,6 +133,7 @@ export default function BasicSetting() {
     const tryChangeSourceWhenPlayFail = useAppConfig("basic.tryChangeSourceWhenPlayFail");
     const carMode = useAppConfig("basic.carMode");
     const keepScreenOn = useAppConfig("basic.keepScreenOn");
+    const autoStartOnBoot = useAppConfig("basic.autoStartOnBoot");
 
     const { t } = useI18N();
 
@@ -170,14 +172,38 @@ export default function BasicSetting() {
                     "basic.keepScreenOn",
                     keepScreenOn ?? false,
                 ),
+                createSwitch(
+                    t("basicSettings.autoStartOnBoot"),
+                    "basic.autoStartOnBoot",
+                    autoStartOnBoot ?? false,
+                    newValue => {
+                        Config.setConfig("basic.autoStartOnBoot", newValue);
+                        NativeUtils?.setAutoStartOnBoot?.(newValue);
+                    },
+                ),
+                {
+                    title: t("basicSettings.openDefaultAppsSettings"),
+                    right: undefined,
+                    onPress: () => {
+                        NativeUtils?.openDefaultAppsSettings?.();
+                    },
+                },
             ],
             footer: (
-                <ThemeText
-                    fontSize="description"
-                    fontColor="textSecondary"
-                    style={styles.sectionFooter}>
-                    {t("basicSettings.carMode.description")}
-                </ThemeText>
+                <View>
+                    <ThemeText
+                        fontSize="description"
+                        fontColor="textSecondary"
+                        style={styles.sectionFooter}>
+                        {t("basicSettings.carMode.description")}
+                    </ThemeText>
+                    <ThemeText
+                        fontSize="description"
+                        fontColor="textSecondary"
+                        style={styles.sectionFooter}>
+                        {t("basicSettings.defaultMusicHint")}
+                    </ThemeText>
+                </View>
             ),
         },
         {

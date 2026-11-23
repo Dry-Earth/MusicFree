@@ -6,6 +6,7 @@ import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
+import android.content.Intent
 import android.os.Bundle
 
 class MainActivity : ReactActivity() {
@@ -27,5 +28,14 @@ class MainActivity : ReactActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
       SplashScreenManager.registerOnActivity(this)
       super.onCreate(null);
+      // 冷启动时先缓存语音指令，等 JS bootstrap 完成后读取
+      VoiceCommandModule.handleIntent(this, intent)
+  }
+
+  override fun onNewIntent(intent: Intent) {
+      super.onNewIntent(intent)
+      setIntent(intent)
+      // App 已运行时直接发给 JS
+      VoiceCommandModule.handleIntent(this, intent)
   }
 }

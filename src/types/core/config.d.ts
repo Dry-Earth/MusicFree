@@ -35,6 +35,7 @@ export interface IAppConfigProperties {
     // Car / head unit
     "basic.carMode": "auto" | "on" | "off";
     "basic.keepScreenOn": boolean;
+    "basic.autoStartOnBoot": boolean;
 
     // Lyric
     "lyric.showStatusBarLyric": boolean;

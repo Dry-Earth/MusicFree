@@ -122,6 +122,44 @@ class UtilsModule(context: ReactApplicationContext) : ReactContextBaseJavaModule
         }
     }
 
+    /** 开机自启动开关，BootReceiver 读取同一个 SharedPreferences */
+    @ReactMethod
+    fun setAutoStartOnBoot(enabled: Boolean) {
+        reactContext.getSharedPreferences("musicfree_car", Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean("auto_start_on_boot", enabled)
+            .apply()
+    }
+
+    @ReactMethod
+    fun isAutoStartOnBootEnabled(promise: Promise) {
+        promise.resolve(
+            reactContext.getSharedPreferences("musicfree_car", Context.MODE_PRIVATE)
+                .getBoolean("auto_start_on_boot", false),
+        )
+    }
+
+    /** 打开系统默认应用设置；BYD 的默认音乐通常在「小迪设置 → 音乐」中 */
+    @ReactMethod
+    fun openDefaultAppsSettings() {
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
+        } else {
+            Intent(Settings.ACTION_SETTINGS)
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            val activity = reactContext.currentActivity
+            if (activity != null) {
+                activity.startActivity(intent)
+            } else {
+                reactContext.startActivity(intent)
+            }
+        } catch (_: Exception) {
+            openAppDetailsSettings()
+        }
+    }
+
     @ReactMethod
     fun isIgnoringBatteryOptimizations(promise: Promise) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

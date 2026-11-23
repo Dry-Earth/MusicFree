@@ -319,6 +319,9 @@ export interface ILanguageData {
     "basicSettings.carMode.off": string; // 关闭
     "basicSettings.carMode.description": string; // 车机模式说明
     "basicSettings.keepScreenOn": string; // 车机模式保持屏幕常亮
+    "basicSettings.autoStartOnBoot": string; // 开机自启动
+    "basicSettings.openDefaultAppsSettings": string; // 打开默认应用设置
+    "basicSettings.defaultMusicHint": string; // 默认音乐提示
     
     "basicSettings.plugin": string; // 插件
     "basicSettings.autoUpdatePlugin": string; // 软件启动时自动更新插件
@@ -405,6 +408,9 @@ export interface ILanguageData {
     "toast.logCleared": string; // 日志已清空
     "toast.noFloatWindowPermission": string; // 无悬浮窗权限
     "toast.folderNotExistOrNoPermission": string; // 文件夹不存在或无权限
+    "toast.voiceNoPlugin": string; // 无可用搜索插件
+    "toast.voicePlaying": string; // 语音播放中
+    "toast.voiceNoResult": string; // 语音搜索无结果
     
     // 音质相关
     "musicQuality.low": string; // 低音质

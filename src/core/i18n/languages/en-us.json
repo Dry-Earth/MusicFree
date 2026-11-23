@@ -449,5 +449,11 @@
     "dialog.checkStorage.button.openAppSettings": "Open App Settings",
     "fileSelector.storagePermissionTip": "Storage permission is not granted. Only the app-specific folder is shown.",
     "fileSelector.grantPermission": "Grant",
-    "fileSelector.appPrivateDir": "App folder"
+    "fileSelector.appPrivateDir": "App folder",
+    "basicSettings.autoStartOnBoot": "Start on boot (if head unit allows)",
+    "basicSettings.openDefaultAppsSettings": "Open system default apps settings",
+    "basicSettings.defaultMusicHint": "Default music: some DiLink versions require choosing it in XiaoDi Settings → Music; third-party apps cannot set themselves as default.",
+    "toast.voiceNoPlugin": "No searchable plugin. Please install and enable a plugin first.",
+    "toast.voicePlaying": "Playing: {name}",
+    "toast.voiceNoResult": "No result for \"{query}\""
 }

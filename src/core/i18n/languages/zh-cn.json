@@ -449,5 +449,11 @@
     "dialog.checkStorage.button.openAppSettings": "打开应用设置",
     "fileSelector.storagePermissionTip": "未授予文件访问权限，当前仅显示应用专属目录。",
     "fileSelector.grantPermission": "去授权",
-    "fileSelector.appPrivateDir": "应用目录"
+    "fileSelector.appPrivateDir": "应用目录",
+    "basicSettings.autoStartOnBoot": "开机自启动（需车机允许）",
+    "basicSettings.openDefaultAppsSettings": "打开系统默认应用设置",
+    "basicSettings.defaultMusicHint": "默认音乐：部分 DiLink 版本需在「小迪设置 → 音乐」中选择；第三方 App 无法自行设为默认。",
+    "toast.voiceNoPlugin": "没有可用的搜索插件，请先安装并启用插件",
+    "toast.voicePlaying": "正在播放：{name}",
+    "toast.voiceNoResult": "没有找到「{query}」"
 }

@@ -18,7 +18,8 @@
   - 自动识别为车机时 UI 整体放大 15%（`rpx` 全局系数）；
   - 底部播放栏加高，并增加「上一首 / 下一首」大按钮，方便驾驶中盲操；
   - 侧边栏最大宽度限制为 420dp，避免在 1920px 车机上占满半屏；
-  - 可选「保持屏幕常亮」。
+  - 可选「保持屏幕常亮」「开机自启动」；
+  - 提供「打开系统默认应用设置」入口和 BYD 默认音乐设置提示。
 
 设置入口：`侧边栏 → 基本设置 → 车机模式`。
 
@@ -38,7 +39,8 @@
 | 前台服务 | 保留 `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_MEDIA_PLAYBACK` + `WAKE_LOCK`，锁车/切后台继续播放 |
 | 电池优化 | 新增权限页入口，可跳转「忽略电池优化」白名单，避免 DiLink 杀后台 |
 | 悬浮歌词 | 保留 `SYSTEM_ALERT_WINDOW`，但车机没有悬浮窗设置页时自动回退到应用详情页，不再崩溃 |
-| 自启动 | 不做强制自启动（避免打扰），请在 BYD 系统设置中手动把本应用加入自启动/后台白名单 |
+| 开机自启动 | 新增 `RECEIVE_BOOT_COMPLETED` + `BootReceiver`，设置中可开关；是否生效取决于 BYD 是否允许后台启动 Activity |
+| 默认音乐 | 新增「打开系统默认应用设置」入口；BYD 的默认音乐通常在「小迪设置 → 音乐」中，第三方 App 无法自行设为默认 |
 
 权限页新增：通知权限、电池优化白名单、打开应用设置，并显示 BYD/车机提示。
 
@@ -48,10 +50,15 @@
 - 本地音乐页/文件选择器会自动回退到应用专属目录，并显示「去授权」按钮；
 - 可把 U 盘音乐先复制到该目录，再在应用内选择。
 
-### 4. 音频与方控
+### 4. 音频、语音与方控
 
 - 导航播报时默认「压低音量」而不是直接暂停（`alwaysPauseOnInterruption = false`；车机未手动设置时默认 `lowerVolume`，手机保持 `pause`）。
 - 方向盘媒体键通过系统 MediaSession 生效（播放/暂停/上一首/下一首）。
+- 新增标准语音接口支持：
+  - `android.media.action.MEDIA_PLAY_FROM_SEARCH`：语音搜索词会依次在已启用插件中搜索，并播放第一个结果；
+  - `android.media.action.MEDIA_PLAY_FROM_URI`：语音“播放这个音频”会导入并播放对应 URI。
+  - 如果 BYD 小迪使用这两个标准接口，就可以直接语音点歌；如果它走私有协议，需要抓 `adb logcat` 后做专门适配。
+- 没有硬塞 AAOS 的 `MediaBrowserService`：BYD DiLink 不是 Android Automotive，且 RNTP 没有公开 MediaSession token；额外创建一个假会话会抢走媒体按键，反而可能让小迪的播放/暂停失效。等确认小迪使用浏览器服务后再加。
 - 额外保留广播控制接口，方便 Tasker、车机语音助手或自己写的方控 App 调用：
 
 ```bash
@@ -70,8 +77,15 @@ adb shell am broadcast -a fun.upup.musicfree.custom.CONTROL --es action pause
 - 应用显示名称改为「MusicFree 车机版」，便于和手机版区分。
 
 - 默认只打包 `arm64-v8a`、`armeabi-v7a`，减小车机安装包体积。
-- 没有 `android/keystore.properties` 时自动回退到仓库内的 `debug.keystore` 签名，保证 `assembleRelease` 开箱可构建、可覆盖升级。
-- `versionCode` 提升到 `400012`。
+- 没有 `android/keystore.properties` 时自动回退到仓库内的 `debug.keystore` 签名，保证 `assembleRelease` 开箱可构建。
+- 已生成正式签名 keystore，并配置到本仓库 Actions Secrets：
+  - `RELEASE_KEYSTORE_BASE64`
+  - `RELEASE_STORE_PASSWORD`
+  - `RELEASE_KEY_ALIAS`
+  - `RELEASE_KEY_PASSWORD`
+- keystore 备份位置：`~/Documents/Default Project/musicfree-car-signing/`（不要提交到仓库！）。密码在同目录 `credentials.txt`，请自行备份到安全位置。
+- `versionCode` 提升到 `400013`。
+- 从 debug 签名切换到正式签名后，车机上必须先卸载旧 debug 版再安装，否则会提示签名不一致。
 
 ## 二、构建 APK
 

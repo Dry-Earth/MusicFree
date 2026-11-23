@@ -30,6 +30,7 @@ class MainApplication : Application(), ReactApplication {
               add(Mp3UtilPackage())
               add(LyricUtilPackage())
               add(MusicControlPackage())
+              add(VoiceCommandPackage())
             }
 
         override fun getJSMainModuleName(): String = "index"

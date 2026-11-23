@@ -27,6 +27,7 @@ import i18n from "@/core/i18n";
 import bootstrapAtom from "./bootstrap.atom";
 import { getDefaultStore } from "jotai";
 import { MusicControl } from "@/utils/MusicControlModule";
+import { setupVoiceCommand } from "@/core/voiceCommand";
 
 
 // 依赖管理
@@ -110,6 +111,11 @@ async function bootstrapImpl() {
     ]);
     trace("配置初始化完成");
     logger.mark("配置初始化完成");
+
+    // 同步开机自启动标记（升级/清数据后自愈）
+    NativeUtils?.setAutoStartOnBoot?.(
+        Config.getConfig("basic.autoStartOnBoot") === true,
+    );
 
     // 加载插件
     await PluginManager.setup();
@@ -302,6 +308,9 @@ async function extraMakeup() {
 
 
 function bindEvents() {
+    // 标准语音点歌 / 播放 URI
+    setupVoiceCommand();
+
     // 车机/方控广播控制（BYD 车机可通过广播或 Tasker 发送）
     // adb shell am broadcast -a fun.upup.musicfree.custom.CONTROL --es action toggle
     MusicControl.addListener(async evt => {

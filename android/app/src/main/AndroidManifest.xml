@@ -28,6 +28,8 @@
 
     <!-- 车机常驻播放/下载，避免被系统省电策略杀掉 -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- 可选开机自启动；是否生效取决于车机后台启动白名单 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!--
       车机兼容性声明：
@@ -86,6 +88,24 @@
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+        </intent-filter>
+        <!-- 标准语音点歌：小迪/Android Auto/其他助手如果使用标准接口会走这里 -->
+        <intent-filter>
+            <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
+        <!-- 标准语音“播放这个音频” -->
+        <intent-filter>
+            <action android:name="android.media.action.MEDIA_PLAY_FROM_URI" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:scheme="content" />
+            <data android:mimeType="audio/*" />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.media.action.MEDIA_PLAY_FROM_URI" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:scheme="file" />
+            <data android:mimeType="audio/*" />
         </intent-filter>
           <intent-filter>
               <action android:name="android.intent.action.VIEW" />
@@ -219,6 +239,16 @@
         <receiver android:name=".MusicControlReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="fun.upup.musicfree.custom.CONTROL" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
     </application>

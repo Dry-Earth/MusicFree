@@ -25,6 +25,9 @@ interface INativeUtils extends NativeModule {
     isIgnoringBatteryOptimizations: () => Promise<boolean>;
     requestIgnoreBatteryOptimizations: () => void;
     openAppDetailsSettings: () => void;
+    setAutoStartOnBoot: (enabled: boolean) => void;
+    isAutoStartOnBootEnabled: () => Promise<boolean>;
+    openDefaultAppsSettings: () => void;
 }
 
 const NativeUtils = NativeModules.NativeUtils;
