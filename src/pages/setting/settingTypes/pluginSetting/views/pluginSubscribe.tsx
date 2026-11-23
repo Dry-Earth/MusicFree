@@ -13,6 +13,7 @@ import { showDialog } from "@/components/dialogs/useDialog";
 import AppBar from "@/components/base/appBar";
 import Fab from "@/components/base/fab";
 import { useI18N } from "@/core/i18n";
+import { useGoBack } from "@/core/router";
 import { useNavigation } from "@react-navigation/native";
 
 interface ISubscribeItem {
@@ -24,6 +25,7 @@ const ITEM_HEIGHT = rpx(108);
 
 export default function PluginSubscribe() {
     const navigation = useNavigation<any>();
+    const carGoBack = useGoBack();
     const urls = useAppConfig("plugin.subscribeUrl") ?? "";
     const [subscribes, setSubscribes] = useState<Array<ISubscribeItem>>([]);
 
@@ -83,7 +85,10 @@ export default function PluginSubscribe() {
 
     return (
         <>
-            <AppBar onBackPress={() => navigation.goBack()}>
+            <AppBar
+                onBackPress={() =>
+                    navigation.canGoBack() ? navigation.goBack() : carGoBack()
+                }>
                 {t("pluginSetting.menu.subscriptionSetting")}
             </AppBar>
             <HorizontalSafeAreaView style={globalStyle.flex1}>

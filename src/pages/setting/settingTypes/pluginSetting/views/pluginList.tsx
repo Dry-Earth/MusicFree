@@ -10,6 +10,7 @@ import { trace } from "@/utils/log";
 import Toast from "@/utils/toast";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import { useGoBack } from "@/core/router";
 import Config from "@/core/appConfig";
 import Empty from "@/components/base/empty";
 import HorizontalSafeAreaView from "@/components/base/horizontalSafeAreaView.tsx";
@@ -35,6 +36,7 @@ export default function PluginList() {
     const [loading, setLoading] = useState(false);
 
     const navigator = useNavigation<any>();
+    const carGoBack = useGoBack();
 
     const menuOptions: IOption[] = [
         {
@@ -268,7 +270,9 @@ export default function PluginList() {
         <>
             <AppBar
                 menu={menuOptions}
-                onBackPress={() => navigator.goBack()}>
+                onBackPress={() =>
+                    navigator.canGoBack() ? navigator.goBack() : carGoBack()
+                }>
                 {t("sidebar.pluginManagement")}
             </AppBar>
             <HorizontalSafeAreaView style={style.wrapper}>
