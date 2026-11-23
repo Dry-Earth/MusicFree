@@ -14,6 +14,7 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import `fun`.upup.musicfree.MainActivity
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
