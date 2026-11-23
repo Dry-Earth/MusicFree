@@ -38,6 +38,9 @@ export default function CheckStorage() {
                 <ThemeText style={styles.item}>
                     {t("dialog.checkStorage.content.3")}
                 </ThemeText>
+                <ThemeText style={styles.item}>
+                    {t("dialog.checkStorage.content.4")}
+                </ThemeText>
             </ScrollView>
 
             <TouchableOpacity
@@ -59,7 +62,15 @@ export default function CheckStorage() {
                         onPress: onCancel,
                     },
                     {
-                        title: t("dialog.checkStorage.button.doNotShowAgain"),
+                        title: t("dialog.checkStorage.button.openAppSettings"),
+                        type: "normal",
+                        onPress: () => {
+                            NativeUtils.openAppDetailsSettings();
+                            hideDialog();
+                        },
+                    },
+                    {
+                        title: t("dialog.checkStorage.button.grantPermission"),
                         type: "primary",
                         onPress: () => {
                             NativeUtils.requestStoragePermission();

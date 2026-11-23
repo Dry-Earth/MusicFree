@@ -32,6 +32,10 @@ export interface IAppConfigProperties {
     "basic.musicOrderInLocalSheet": SortType;
     "basic.tryChangeSourceWhenPlayFail": boolean;
 
+    // Car / head unit
+    "basic.carMode": "auto" | "on" | "off";
+    "basic.keepScreenOn": boolean;
+
     // Lyric
     "lyric.showStatusBarLyric": boolean;
     "lyric.topPercent": number;

@@ -12,9 +12,11 @@ import useColors from "@/hooks/useColors";
 import useHardwareBack from "@/hooks/useHardwareBack";
 import rpx from "@/utils/rpx";
 import { useNavigation } from "@react-navigation/native";
+import NativeUtils from "@/native/utils";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { AppState, Pressable, StyleSheet, View } from "react-native";
 import {
+    ExternalDirectoryPath,
     ExternalStorageDirectoryPath,
     exists,
     getAllExternalFilesDirs,
@@ -59,6 +61,24 @@ export default function FileSelector() {
     const navigation = useNavigation();
     const colors = useColors();
     const [loading, setLoading] = useState(false);
+    const [storageGranted, setStorageGranted] = useState(true);
+
+    // 车机经常无法授予「所有文件访问」，此时退回到应用专属目录，仍可选择下载目录
+    useEffect(() => {
+        const subscription = AppState.addEventListener("change", async state => {
+            if (state !== "active") {
+                return;
+            }
+            const granted = await Promise.resolve(
+                NativeUtils?.checkStoragePermission?.() ?? true,
+            ).catch(() => false);
+            setStorageGranted(granted);
+            if (granted && currentPathRef.current.path === ExternalDirectoryPath) {
+                setCurrentPath({ path: "/", parent: null });
+            }
+        });
+        return () => subscription.remove();
+    }, []);
 
     useEffect(() => {
         (async () => {
@@ -66,6 +86,20 @@ export default function FileSelector() {
             setLoading(true);
             try {
                 if (currentPath.path === "/") {
+                    const granted = await Promise.resolve(
+                        NativeUtils?.checkStoragePermission?.() ?? true,
+                    ).catch(() => false);
+                    setStorageGranted(granted);
+                    if (!granted) {
+                        const privatePath = {
+                            path: ExternalDirectoryPath,
+                            parent: null,
+                        };
+                        currentPathRef.current = privatePath;
+                        setCurrentPath(privatePath);
+                        setLoading(false);
+                        return;
+                    }
                     try {
                         const allExt = await getAllExternalFilesDirs();
                         if (allExt.length > 1) {
@@ -206,20 +240,51 @@ export default function FileSelector() {
     }, [filesData, checkedPaths]);
 
     const renderHeader = () => {
-        return multi ? (
-            <View style={style.selectAll}>
-                <Button
-                    onPress={() => {
-                        if (currentPageAllChecked) {
-                            selectPath(filesData, false);
-                        } else {
-                            selectPath(filesData, true);
-                        }
-                    }}>
-                    {currentPageAllChecked ? "全不选" : "全选"}
-                </Button>
-            </View>
-        ) : null;
+        return (
+            <>
+                {!storageGranted ? (
+                    <View style={style.permissionTip}>
+                        <ThemeText
+                            fontSize="description"
+                            fontColor="textSecondary"
+                            style={style.permissionTipText}>
+                            {i18n.t("fileSelector.storagePermissionTip")}
+                        </ThemeText>
+                        <View style={style.permissionActions}>
+                            <Button
+                                onPress={() => {
+                                    NativeUtils?.requestStoragePermission?.();
+                                }}>
+                                {i18n.t("fileSelector.grantPermission")}
+                            </Button>
+                            <Button
+                                onPress={() => {
+                                    setCurrentPath({
+                                        path: ExternalDirectoryPath,
+                                        parent: null,
+                                    });
+                                }}>
+                                {i18n.t("fileSelector.appPrivateDir")}
+                            </Button>
+                        </View>
+                    </View>
+                ) : null}
+                {multi ? (
+                    <View style={style.selectAll}>
+                        <Button
+                            onPress={() => {
+                                if (currentPageAllChecked) {
+                                    selectPath(filesData, false);
+                                } else {
+                                    selectPath(filesData, true);
+                                }
+                            }}>
+                            {currentPageAllChecked ? "全不选" : "全选"}
+                        </Button>
+                    </View>
+                ) : null}
+            </>
+        );
     };
 
     return (
@@ -316,5 +381,18 @@ const style = StyleSheet.create({
         paddingHorizontal: rpx(24),
         flexDirection: "row",
         alignItems: "center",
+    },
+    permissionTip: {
+        width: "100%",
+        paddingHorizontal: rpx(24),
+        paddingVertical: rpx(20),
+    },
+    permissionTipText: {
+        lineHeight: rpx(32),
+    },
+    permissionActions: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: rpx(8),
     },
 });

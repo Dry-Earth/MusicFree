@@ -3,11 +3,15 @@ buildscript {
         buildToolsVersion = "35.0.0"
         minSdkVersion = 24
         compileSdkVersion = 35
-        targetSdkVersion = 30
+        // 车机适配：BYD DiLink 等 Android 9/10 车机无法申请「所有文件访问」，
+        // 使用 targetSdk 29 + requestLegacyExternalStorage 获得传统存储读写能力。
+        // 如仅需应用专属目录，可自行改回 30/34，并恢复 MANAGE_EXTERNAL_STORAGE。
+        targetSdkVersion = 29
         ndkVersion = "26.1.10909125"
         kotlinVersion = "1.9.24"
     }
     repositories {
+        maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/central'}
         maven { url 'https://maven.aliyun.com/repository/public' }
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
@@ -22,3 +26,15 @@ buildscript {
     }
 }
 apply plugin: "com.facebook.react.rootproject"
+
+allprojects {
+    repositories {
+        // 国内车机/开发者网络环境优先走阿里云镜像，避免 google() 无法访问
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}

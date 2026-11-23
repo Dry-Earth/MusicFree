@@ -114,7 +114,14 @@ static def getVersion() {
 // }
 
 def appVersion = getVersion()
-def appVersionCode = 400011
+// 车机版独立递增，避免与官方/旧版本覆盖安装时版本号回退
+def appVersionCode = 400012
+
+// 默认只打 ARM 车机包；模拟器调试可用 -PcarAbis=x86_64 覆盖
+def carAbis = (project.findProperty("carAbis") ?: "armeabi-v7a,arm64-v8a")
+    .toString()
+    .split(",")
+    .findAll { it }
 
 
 android {
@@ -138,12 +145,14 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        // !! Add lines
-         release {
-            storeFile file(keystoreProperties['RELEASE_STORE_FILE'])
-            storePassword keystoreProperties['RELEASE_STORE_PASSWORD']
-            keyAlias keystoreProperties['RELEASE_KEY_ALIAS']
-            keyPassword keystoreProperties['RELEASE_KEY_PASSWORD']
+        // 没有 keystore.properties 时回退到 debug 签名，保证车机侧载可直接构建/覆盖升级
+        if (keystorePropertiesFile.exists()) {
+            release {
+                storeFile file(keystoreProperties['RELEASE_STORE_FILE'])
+                storePassword keystoreProperties['RELEASE_STORE_PASSWORD']
+                keyAlias keystoreProperties['RELEASE_KEY_ALIAS']
+                keyPassword keystoreProperties['RELEASE_KEY_PASSWORD']
+            }
         }
     }
     splits {
@@ -151,7 +160,9 @@ android {
                 reset()
                 enable true
                 universalApk true
-                include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+                // BYD 车机均为 ARM；去掉 x86 可减小安装包。
+                // 模拟器调试：./gradlew assembleDebug -PcarAbis=x86_64 -PreactNativeArchitectures=x86_64
+                include(*carAbis)
             }
     }
 
@@ -162,9 +173,9 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.release
+            // 优先使用 keystore.properties 中的正式签名；缺失时回退 debug 签名，便于车机侧载升级。
+            // 正式发布请参考 CAR_BUILD.md 生成并保存自己的 keystore。
+            signingConfig keystorePropertiesFile.exists() ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

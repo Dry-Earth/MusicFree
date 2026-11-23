@@ -3,13 +3,16 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.PowerManager
 import android.provider.Settings
 import android.util.DisplayMetrics
 import android.view.WindowInsets
 import android.view.WindowManager
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
@@ -33,29 +36,186 @@ class UtilsModule(context: ReactApplicationContext) : ReactContextBaseJavaModule
         exitProcess(0)
     }
 
+    /** targetSdk >= 30 且 Android 11+ 才使用「所有文件访问」；车机（targetSdk 29）走传统存储权限 */
+    private fun useAllFilesAccess(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+            reactContext.applicationInfo.targetSdkVersion >= Build.VERSION_CODES.R
+    }
+
+    private fun hasRuntimeStoragePermission(): Boolean {
+        val readPermission = ContextCompat.checkSelfPermission(
+            reactContext,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+        ) == PackageManager.PERMISSION_GRANTED || (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(
+                    reactContext,
+                    Manifest.permission.READ_MEDIA_AUDIO,
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11+ 传统存储模式下，读权限即可覆盖应用可访问的媒体文件
+            return readPermission
+        }
+        val writePermission = ContextCompat.checkSelfPermission(
+            reactContext,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        ) == PackageManager.PERMISSION_GRANTED
+        return readPermission && writePermission
+    }
+
     @ReactMethod
     fun checkStoragePermission(promise: Promise) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (useAllFilesAccess() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             promise.resolve(Environment.isExternalStorageManager())
         } else {
-            val readPermission = ContextCompat.checkSelfPermission(reactContext, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-            val writePermission = ContextCompat.checkSelfPermission(reactContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-            promise.resolve(readPermission && writePermission)
+            promise.resolve(hasRuntimeStoragePermission())
         }
     }
 
     @ReactMethod
     fun requestStoragePermission() {
-        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+        val activity = reactContext.currentActivity
+        if (useAllFilesAccess() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
                 data = Uri.parse("package:${reactContext.packageName}")
             }
+            try {
+                if (activity != null) {
+                    activity.startActivity(intent)
+                } else {
+                    reactContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                }
+            } catch (_: Exception) {
+                openAppDetailsSettings()
+            }
+            return
+        }
+
+        if (activity != null) {
+            val permissions = mutableListOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissions.add(Manifest.permission.READ_MEDIA_AUDIO)
+            }
+            ActivityCompat.requestPermissions(
+                activity,
+                permissions.toTypedArray(),
+                1001,
+            )
         } else {
-            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.parse("package:${reactContext.packageName}")
+            openAppDetailsSettings()
+        }
+    }
+
+    @ReactMethod
+    fun openAppDetailsSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.parse("package:${reactContext.packageName}")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        try {
+            reactContext.startActivity(intent)
+        } catch (_: Exception) {
+        }
+    }
+
+    @ReactMethod
+    fun isIgnoringBatteryOptimizations(promise: Promise) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager = reactContext.getSystemService(Context.POWER_SERVICE) as? PowerManager
+            promise.resolve(powerManager?.isIgnoringBatteryOptimizations(reactContext.packageName) == true)
+        } else {
+            promise.resolve(true)
+        }
+    }
+
+    @ReactMethod
+    fun requestIgnoreBatteryOptimizations() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return
+        }
+        val powerManager = reactContext.getSystemService(Context.POWER_SERVICE) as? PowerManager
+        if (powerManager?.isIgnoringBatteryOptimizations(reactContext.packageName) == true) {
+            return
+        }
+        val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+            data = Uri.parse("package:${reactContext.packageName}")
+        }
+        try {
+            val activity = reactContext.currentActivity
+            if (activity != null) {
+                activity.startActivity(intent)
+            } else {
+                reactContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }
+        } catch (_: Exception) {
+            try {
+                val settingsIntent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                val activity = reactContext.currentActivity
+                if (activity != null) {
+                    activity.startActivity(settingsIntent)
+                } else {
+                    reactContext.startActivity(settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                }
+            } catch (_: Exception) {
+                openAppDetailsSettings()
             }
         }
-        reactContext.currentActivity?.startActivity(intent)
+    }
+
+    /** 车机设备信息，供 JS 侧自动识别车机/大屏并切换布局 */
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    fun getDeviceInfo(): WritableMap {
+        val configuration = reactContext.resources.configuration
+        val packageManager = reactContext.packageManager
+        val brand = Build.BRAND ?: ""
+        val manufacturer = Build.MANUFACTURER ?: ""
+        val model = Build.MODEL ?: ""
+        val deviceText = "$brand $manufacturer $model".lowercase()
+
+        val uiMode = when (configuration.uiMode and Configuration.UI_MODE_TYPE_MASK) {
+            Configuration.UI_MODE_TYPE_CAR -> "car"
+            Configuration.UI_MODE_TYPE_DESK -> "desk"
+            Configuration.UI_MODE_TYPE_TELEVISION -> "television"
+            Configuration.UI_MODE_TYPE_APPLIANCE -> "appliance"
+            Configuration.UI_MODE_TYPE_WATCH -> "watch"
+            else -> "normal"
+        }
+
+        return Arguments.createMap().apply {
+            putString("brand", brand)
+            putString("manufacturer", manufacturer)
+            putString("model", model)
+            putString("device", Build.DEVICE ?: "")
+            putString("product", Build.PRODUCT ?: "")
+            putString("uiMode", uiMode)
+            putInt("sdkInt", Build.VERSION.SDK_INT)
+            putInt("smallestScreenWidthDp", configuration.smallestScreenWidthDp)
+            putBoolean(
+                "isAutomotive",
+                packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE),
+            )
+            putBoolean(
+                "isLeanback",
+                packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK),
+            )
+            putBoolean(
+                "isTelevision",
+                packageManager.hasSystemFeature(PackageManager.FEATURE_TELEVISION),
+            )
+            putBoolean(
+                "isByd",
+                deviceText.contains("byd") ||
+                    deviceText.contains("dilink") ||
+                    deviceText.contains("比亚迪") ||
+                    deviceText.contains("denza") ||
+                    deviceText.contains("腾势"),
+            )
+            putBoolean("isLegacyStorage", !useAllFilesAccess())
+        }
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)

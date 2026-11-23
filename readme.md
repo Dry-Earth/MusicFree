@@ -17,6 +17,8 @@
 
 一个插件化、定制化、无广告的免费音乐播放器，目前只支持 Android 和 Harmony OS。
 
+> **车机版说明**：本仓库包含 Android 车机（BYD DiLink）适配改动，包括车机模式、横屏大按钮、存储/通知/后台权限适配，详见 [CAR_BUILD.md](./CAR_BUILD.md)。
+
 > **桌面版来啦：<https://github.com/maotoumao/MusicFreeDesktop>**
 
 如果需要了解后续进展可以关注公众号↓；如果有问题可以在 issue 区或者公众号直接留言反馈。

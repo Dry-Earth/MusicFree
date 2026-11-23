@@ -1,14 +1,55 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fun.upup.musicfree.custom">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="fun.upup.musicfree.custom">
 
+    <!-- 网络与播放 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Android 14+ 前台服务类型；targetSdk 29 时系统会忽略，保留以兼容后续升级 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- 通知：播放控制通知 / Android 13+ 通知权限 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- 桌面歌词悬浮窗（部分车机系统不允许，可在权限页关闭） -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!--
+      存储权限：targetSdk 29 + requestLegacyExternalStorage，
+      兼容 BYD DiLink（Android 9/10/11）等无法申请「所有文件访问」的车机。
+      Android 13+ 读取本地音乐使用 READ_MEDIA_AUDIO。
+    -->
+    <!-- targetSdk 29 + 传统存储：Android 13+ 仍需保留 READ_EXTERNAL_STORAGE 兼容模式 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+    <!-- 车机常驻播放/下载，避免被系统省电策略杀掉 -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!--
+      车机兼容性声明：
+      - 不要求触摸屏/汽车/Leanback，避免 BYD DiLink 等非 Android Automotive 车机被应用市场过滤
+      - 不锁定横竖屏，BYD 旋转屏可正常跟随系统旋转
+    -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.hardware.faketouch" android:required="false" />
+    <uses-feature android:name="android.hardware.type.automotive" android:required="false" />
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
+    <uses-feature android:name="android.hardware.screen.landscape" android:required="false" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:anyDensity="true"
+        android:resizeable="true" />
 
     <application
       android:name=".MainApplication"
@@ -21,18 +62,31 @@
       android:requestLegacyExternalStorage="true"
       android:usesCleartextTraffic="true"
       android:extractNativeLibs="true"
+      android:largeHeap="true"
+      android:hardwareAccelerated="true"
+      android:appCategory="audio"
+      tools:ignore="UnusedAttribute"
     >
       <activity
         android:name=".MainActivity"
         android:theme="@style/Theme.App.SplashScreen"
         android:label="@string/app_name"
-        android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+        android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|density"
         android:launchMode="singleTask"
         android:windowSoftInputMode="adjustResize"
+        android:resizeableActivity="true"
+        android:screenOrientation="unspecified"
         android:exported="true">
+        <!-- 普通桌面 / 车机桌面 -->
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
+            <category android:name="android.intent.category.APP_MUSIC" />
+        </intent-filter>
+        <!-- Android TV / 部分车机 Leanback 桌面 -->
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
         </intent-filter>
           <intent-filter>
               <action android:name="android.intent.action.VIEW" />

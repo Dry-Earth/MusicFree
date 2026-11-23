@@ -115,6 +115,15 @@ export interface ILanguageData {
     "permissionSetting.floatWindowPermissionDescription": string; // 悬浮窗权限说明
     "permissionSetting.fileReadWritePermission": string; // 文件读写权限
     "permissionSetting.fileReadWritePermissionDescription": string; // 文件读写权限说明
+    "permissionSetting.notificationPermission": string; // 通知权限
+    "permissionSetting.notificationPermissionDescription": string; // 通知权限说明
+    "permissionSetting.batteryOptimization": string; // 电池优化白名单
+    "permissionSetting.batteryOptimizationDescription": string; // 电池优化白名单说明
+    "permissionSetting.openAppSettings": string; // 打开应用设置
+    "permissionSetting.openAppSettingsDescription": string; // 打开应用设置说明
+    "permissionSetting.carTip": string; // 车机提示
+    "permissionSetting.bydTip": string; // BYD 提示
+    "permissionSetting.storageFallback": string; // 存储权限回退说明
 
     // 推荐歌单相关
     "recommendSheet.title": string; // 推荐歌单
@@ -303,6 +312,13 @@ export interface ILanguageData {
     "basicSettings.musicOrderInLocalSheet.album": string; // 按专辑名排序
     "basicSettings.musicOrderInLocalSheet.newest": string; // 按收藏时间从新到旧排序
     "basicSettings.musicOrderInLocalSheet.oldest": string; // 按收藏时间从旧到新排序
+
+    "basicSettings.carMode": string; // 车机模式
+    "basicSettings.carMode.auto": string; // 自动识别
+    "basicSettings.carMode.on": string; // 强制开启
+    "basicSettings.carMode.off": string; // 关闭
+    "basicSettings.carMode.description": string; // 车机模式说明
+    "basicSettings.keepScreenOn": string; // 车机模式保持屏幕常亮
     
     "basicSettings.plugin": string; // 插件
     "basicSettings.autoUpdatePlugin": string; // 软件启动时自动更新插件
@@ -410,8 +426,15 @@ export interface ILanguageData {
     "dialog.checkStorage.content.1": string; // 存储权限内容1
     "dialog.checkStorage.content.2": string; // 存储权限内容2
     "dialog.checkStorage.content.3": string; // 存储权限内容3
+    "dialog.checkStorage.content.4": string; // 车机存储权限提示
     "dialog.checkStorage.button.grantPermission": string; // 去授予权限
     "dialog.checkStorage.button.doNotShowAgain": string; // 不再提示
+    "dialog.checkStorage.button.openAppSettings": string; // 打开应用设置
+
+    // 文件选择器
+    "fileSelector.storagePermissionTip": string; // 存储权限提示
+    "fileSelector.grantPermission": string; // 去授权
+    "fileSelector.appPrivateDir": string; // 应用目录
 
     // 对话框相关 - 下载
     "dialog.downloadDialog.title": string; // 发现新版本

@@ -21,6 +21,15 @@ public class MusicControlModule extends ReactContextBaseJavaModule {
         return NAME;
     }
 
+    // NativeEventEmitter 在部分 RN 版本要求模块实现这两个方法
+    @ReactMethod
+    public void addListener(String eventName) {
+    }
+
+    @ReactMethod
+    public void removeListeners(Integer count) {
+    }
+
     @ReactMethod
     public void sendControlEvent(String action, String payload, Promise promise) {
         MusicControlReceiver receiver = new MusicControlReceiver();

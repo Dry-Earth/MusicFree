@@ -22,10 +22,11 @@ import Toast from "@/utils/toast";
 import * as SplashScreen from "expo-splash-screen";
 import {  Linking, Platform } from "react-native";
 import { PERMISSIONS, check, request } from "react-native-permissions";
-import RNTrackPlayer, { AppKilledPlaybackBehavior, Capability } from "react-native-track-player";
+import RNTrackPlayer, { AppKilledPlaybackBehavior, Capability, State } from "react-native-track-player";
 import i18n from "@/core/i18n";
 import bootstrapAtom from "./bootstrap.atom";
 import { getDefaultStore } from "jotai";
+import { MusicControl } from "@/utils/MusicControlModule";
 
 
 // 依赖管理
@@ -69,6 +70,20 @@ async function bootstrapImpl() {
         ) {
             await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
             await request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE);
+        }
+    }
+    // 1.1 Android 13+ 通知权限：播放控制通知 / 车机状态栏媒体卡片
+    if (Platform.OS === "android" && Platform.Version >= 33) {
+        try {
+            const notificationPermission = await check(
+                PERMISSIONS.ANDROID.POST_NOTIFICATIONS,
+            );
+            if (notificationPermission === "denied") {
+                await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+            }
+        } catch (e) {
+            // 部分车机系统裁剪了通知权限弹窗，忽略即可，播放不受影响
+            console.warn("request notification permission failed", e);
         }
     }
     logger.mark("权限检查完成");
@@ -181,7 +196,9 @@ export async function initTrackPlayer(logger?: IPerfLogger) {
         icon: ImgAsset.logoTransparent,
         progressUpdateEventInterval: 1,
         android: {
-            alwaysPauseOnInterruption: true,
+            // 车机导航播报时使用「压低音量」而不是直接暂停，避免开车时音乐被反复打断。
+            // 具体 duck 行为由 basic.tempRemoteDuck 配置决定。
+            alwaysPauseOnInterruption: false,
             appKilledPlaybackBehavior:
                 AppKilledPlaybackBehavior.ContinuePlayback,
         },
@@ -285,6 +302,46 @@ async function extraMakeup() {
 
 
 function bindEvents() {
+    // 车机/方控广播控制（BYD 车机可通过广播或 Tasker 发送）
+    // adb shell am broadcast -a fun.upup.musicfree.custom.CONTROL --es action toggle
+    MusicControl.addListener(async evt => {
+        try {
+            switch (evt.action) {
+            case "play":
+                await TrackPlayer.play();
+                break;
+            case "pause":
+                await TrackPlayer.pause();
+                break;
+            case "toggle": {
+                const state = (await RNTrackPlayer.getPlaybackState()).state;
+                if (state === State.Playing) {
+                    await TrackPlayer.pause();
+                } else {
+                    await TrackPlayer.play();
+                }
+                break;
+            }
+            case "next":
+                await TrackPlayer.skipToNext();
+                break;
+            case "previous":
+                await TrackPlayer.skipToPrevious();
+                break;
+            case "play-song": {
+                if (evt.payload) {
+                    await TrackPlayer.play(JSON.parse(evt.payload));
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        } catch (e) {
+            errorLog("车机控制事件处理失败", e);
+        }
+    });
+
     // 下载事件
     downloader.on(DownloaderEvent.DownloadError, (reason) => {
         if (reason === DownloadFailReason.NetworkOffline) {

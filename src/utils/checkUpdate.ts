@@ -2,10 +2,10 @@ import axios from "axios";
 import { compare } from "compare-versions";
 import DeviceInfo from "react-native-device-info";
 
+// 车机版从本仓库检查更新，避免被官方版更新覆盖（签名/功能不同）
 const updateList = [
-    "https://gitee.com/maotoumao/MusicFree/raw/master/release/version.json",
-    "https://raw.githubusercontent.com/maotoumao/MusicFree/master/release/version.json",
-    "https://cdn.jsdelivr.net/gh/maotoumao/MusicFree@master/release/version.json",
+    "https://raw.githubusercontent.com/Dry-Earth/MusicFree/master/release/version.json",
+    "https://cdn.jsdelivr.net/gh/Dry-Earth/MusicFree@master/release/version.json",
 ];
 
 interface IUpdateInfo {

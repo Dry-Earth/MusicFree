@@ -19,7 +19,8 @@ class LyricUtilModule(private val reactContext: ReactApplicationContext): ReactC
         try {
             promise.resolve(Settings.canDrawOverlays(reactContext))
         } catch (e: Exception) {
-            promise.reject("Error", e.message)
+            // 部分车机裁剪了悬浮窗能力，按「不支持」处理，避免 JS 侧未捕获异常
+            promise.resolve(false)
         }
     }
 
@@ -29,10 +30,24 @@ class LyricUtilModule(private val reactContext: ReactApplicationContext): ReactC
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
                 data = Uri.parse("package:" + reactContext.packageName)
             }
-            currentActivity?.startActivity(intent)
+            val activity = currentActivity
+            if (activity != null) {
+                activity.startActivity(intent)
+            } else {
+                reactContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }
             promise.resolve(true)
         } catch (e: Exception) {
-            promise.reject("Error", e.message)
+            // 车机可能没有悬浮窗设置页，退回到应用详情页
+            try {
+                val fallback = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:" + reactContext.packageName)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                reactContext.startActivity(fallback)
+            } catch (_: Exception) {
+            }
+            promise.resolve(false)
         }
     }
 

@@ -63,7 +63,7 @@ const createRadio = function (
                 }))
                 : candidates,
             onOk(val) {
-                Config.setConfig(changeKey, val);
+                Config.setConfig(changeKey, val as any);
                 onChange?.(val);
             },
         });
@@ -130,6 +130,8 @@ export default function BasicSetting() {
     const showExitOnNotification = useAppConfig("basic.showExitOnNotification");
     const musicOrderInLocalSheet = useAppConfig("basic.musicOrderInLocalSheet");
     const tryChangeSourceWhenPlayFail = useAppConfig("basic.tryChangeSourceWhenPlayFail");
+    const carMode = useAppConfig("basic.carMode");
+    const keepScreenOn = useAppConfig("basic.keepScreenOn");
 
     const { t } = useI18N();
 
@@ -149,6 +151,35 @@ export default function BasicSetting() {
     }, []);
 
     const basicOptions = [
+        {
+            title: t("basicSettings.carMode"),
+            data: [
+                createRadio(
+                    t("basicSettings.carMode"),
+                    "basic.carMode",
+                    ["auto", "on", "off"],
+                    carMode ?? "auto",
+                    {
+                        auto: t("basicSettings.carMode.auto"),
+                        on: t("basicSettings.carMode.on"),
+                        off: t("basicSettings.carMode.off"),
+                    },
+                ),
+                createSwitch(
+                    t("basicSettings.keepScreenOn"),
+                    "basic.keepScreenOn",
+                    keepScreenOn ?? false,
+                ),
+            ],
+            footer: (
+                <ThemeText
+                    fontSize="description"
+                    fontColor="textSecondary"
+                    style={styles.sectionFooter}>
+                    {t("basicSettings.carMode.description")}
+                </ThemeText>
+            ),
+        },
         {
             title: t("basicSettings.common"),
             data: [
@@ -657,6 +688,11 @@ const styles = StyleSheet.create({
         height: rpx(80),
         justifyContent: "center",
         alignItems: "center",
+    },
+    sectionFooter: {
+        paddingHorizontal: rpx(24),
+        marginTop: rpx(12),
+        lineHeight: rpx(34),
     },
 });
 

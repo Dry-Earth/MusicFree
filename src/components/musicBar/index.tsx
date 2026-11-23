@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Keyboard, StyleSheet, View } from "react-native";
 import rpx from "@/utils/rpx";
 import { CircularProgressBase } from "react-native-circular-progress-indicator";
@@ -11,11 +11,13 @@ import TrackPlayer, { useCurrentMusic, useMusicState, useProgress } from "@/core
 import { musicIsPaused } from "@/utils/trackUtils";
 import MusicInfo from "./musicInfo";
 import Icon from "@/components/base/icon.tsx";
+import useCarMode from "@/hooks/useCarMode";
 
 function CircularPlayBtn() {
     const progress = useProgress();
     const musicState = useMusicState();
     const colors = useColors();
+    const carMode = useCarMode();
 
     const isPaused = musicIsPaused(musicState);
 
@@ -30,7 +32,7 @@ function CircularPlayBtn() {
                     : 0
             }
             duration={100}
-            radius={rpx(36)}
+            radius={rpx(carMode ? 46 : 36)}
             activeStrokeColor={colors.musicBarText}
             inActiveStrokeColor={colors.textSecondary}>
             <IconButton
@@ -57,6 +59,7 @@ function CircularPlayBtn() {
 }
 function MusicBar() {
     const musicItem = useCurrentMusic();
+    const carMode = useCarMode();
 
     const [showKeyboard, setKeyboardStatus] = useState(false);
 
@@ -83,6 +86,7 @@ function MusicBar() {
                 <View
                     style={[
                         style.wrapper,
+                        carMode ? style.wrapperCar : null,
                         {
                             backgroundColor: colors.musicBar,
                             paddingRight: safeAreaInsets.right + rpx(24),
@@ -95,18 +99,44 @@ function MusicBar() {
                     // }}
                 >
                     <MusicInfo musicItem={musicItem} />
-                    <View style={style.actionGroup}>
+                    <View style={[style.actionGroup, carMode ? style.actionGroupCar : null]}>
+                        {carMode ? (
+                            <Icon
+                                accessible
+                                accessibilityLabel="上一首"
+                                name="skip-left"
+                                size={rpx(64)}
+                                onPress={() => {
+                                    TrackPlayer.skipToPrevious();
+                                }}
+                                color={colors.musicBarText}
+                                style={[style.actionIcon, style.actionIconCar]}
+                            />
+                        ) : null}
                         <CircularPlayBtn />
+                        {carMode ? (
+                            <Icon
+                                accessible
+                                accessibilityLabel="下一首"
+                                name="skip-right"
+                                size={rpx(64)}
+                                onPress={() => {
+                                    TrackPlayer.skipToNext();
+                                }}
+                                color={colors.musicBarText}
+                                style={[style.actionIcon, style.actionIconCar]}
+                            />
+                        ) : null}
                         <Icon
                             accessible
                             accessibilityLabel="播放列表"
                             name="playlist"
-                            size={rpx(56)}
+                            size={rpx(carMode ? 64 : 56)}
                             onPress={() => {
                                 showPanel("PlayList");
                             }}
                             color={colors.musicBarText}
-                            style={[style.actionIcon]}
+                            style={[style.actionIcon, carMode ? style.actionIconCar : null]}
                         />
                     </View>
                 </View>
@@ -115,7 +145,7 @@ function MusicBar() {
     );
 }
 
-export default memo(MusicBar, () => true);
+export default MusicBar;
 
 const style = StyleSheet.create({
     wrapper: {
@@ -125,13 +155,24 @@ const style = StyleSheet.create({
         alignItems: "center",
         paddingRight: rpx(24),
     },
+    wrapperCar: {
+        height: rpx(168),
+    },
     actionGroup: {
         width: rpx(200),
         justifyContent: "flex-end",
         flexDirection: "row",
         alignItems: "center",
     },
+    actionGroupCar: {
+        width: undefined,
+        minWidth: rpx(300),
+        flexShrink: 0,
+    },
     actionIcon: {
         marginLeft: rpx(36),
+    },
+    actionIconCar: {
+        marginLeft: rpx(44),
     },
 });

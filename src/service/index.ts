@@ -3,6 +3,7 @@ import RNTrackPlayer, { Event, State } from "react-native-track-player";
 import TrackPlayer from "@/core/trackPlayer";
 import { musicIsPaused } from "@/utils/trackUtils";
 import PersistStatus from "@/utils/persistStatus";
+import { isCarHeadUnit } from "@/utils/device";
 
 let resumeState: State | null;
 module.exports = async function () {
@@ -25,9 +26,10 @@ module.exports = async function () {
             if (permanent) {
                 return TrackPlayer.pause();
             }
-            const tempRemoteDuckConf = Config.getConfig(
-                "basic.tempRemoteDuck",
-            );
+            // 车机默认在导航播报时压低音量而不是暂停；手机保持原有默认值
+            const tempRemoteDuckConf =
+                Config.getConfig("basic.tempRemoteDuck") ??
+                (isCarHeadUnit ? "lowerVolume" : "pause");
             if (tempRemoteDuckConf === "lowerVolume") {
                 if (paused) {
                     const tempRemoteDuckVolume = Config.getConfig(
