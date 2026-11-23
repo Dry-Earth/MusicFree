@@ -1,6 +1,9 @@
 name: 构建车机版 APK
 
 on:
+  # 推送到 master 自动构建车机版 APK
+  push:
+    branches: [master]
   workflow_dispatch:
     inputs:
       version_suffix:
