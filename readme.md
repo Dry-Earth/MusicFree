@@ -1,216 +1,77 @@
-# MusicFree
+# MusicFree 车机版
 
-**中文** | [English](./readme-en.md)
-
-![GitHub Repo stars](https://img.shields.io/github/stars/maotoumao/MusicFree) 
-![GitHub forks](https://img.shields.io/github/forks/maotoumao/MusicFree)
-![star](https://gitcode.com/maotoumao/MusicFree/star/badge.svg)
-
-![GitHub License](https://img.shields.io/github/license/maotoumao/MusicFree)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/maotoumao/MusicFree/total)
-![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/maotoumao/MusicFree)
-![GitHub package.json version](https://img.shields.io/github/package-json/v/maotoumao/MusicFree)
-
-<a href="https://trendshift.io/repositories/1028" target="_blank"><img src="https://trendshift.io/api/badge/repositories/1028" alt="maotoumao%2FMusicFree | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-
-## 简介
-
-一个插件化、定制化、无广告的免费音乐播放器，目前只支持 Android 和 Harmony OS。
-
-> **车机版说明**：本仓库包含 Android 车机（BYD DiLink）适配改动，包括车机模式、横屏大按钮、存储/通知/后台权限适配，详见 [CAR_BUILD.md](./CAR_BUILD.md)。
-
-> **桌面版来啦：<https://github.com/maotoumao/MusicFreeDesktop>**
-
-如果需要了解后续进展可以关注公众号↓；如果有问题可以在 issue 区或者公众号直接留言反馈。
-
-![微信公众号](./src/assets/imgs/wechat_channel.jpg)
-
-软件下载方式、插件使用说明、插件开发文档可去站点 [https://musicfree.catcat.work](https://musicfree.catcat.work) 查看。
-
-> [!NOTE]
-> - 如果你在其他的平台看到收费版/无广告版/破解版，都是假的，本来就是开源项目，**遇到收费版请直接举报**；
-> - 软件首先是自用，顺带分享出来希望可以帮助到有需要的人；是业余作品，会尽量保持维护，不过每天能写的时间有限（半小时左右），目测会有很长一段时间处于不稳定测试版本，且更新频率不定，请谨慎使用；
-> - 软件的第三方插件、及其所产生的数据与本软件无关，请合理合法使用，可能产生的版权数据请及时删除。
-> - **请不要以 VIP/破解版为噱头进行宣传**，示例仓库基于互联网公开接口封装，并**过滤掉所有 VIP、试听、付费歌曲**，且示例仓库以后也**不会提供具备破解功能的插件**；
-> - 本软件的相关信息**只会主动投放在 Git 仓库以及公众号“一只猫头猫”中**，如果希望写文章介绍本软件请自便，但还烦请**如实陈述，涉及到示例仓库请给插件源打个码**，不要给软件增加一些不实的功能（尽管我也想有）；描述冲突的地方以本仓库为准。
-
-
-## 项目使用约定：
-本项目基于 AGPL 3.0 协议开源，使用此项目时请遵守开源协议。  
-除此外，希望你在使用代码时已经了解以下额外说明：
-
-1. 打包、二次分发 **请保留代码出处**：https://github.com/maotoumao/MusicFree
-2. 请不要用于商业用途，合法合规使用代码；
-3. 如果开源协议变更，将在此 Github 仓库更新，不另行通知。
-
-> [!CAUTION]
-> ### 👎 Hall of Shame
-> 👎 小米/华为/vivo等<ins>应用市场的 MusicFree </ins>和本软件无关，**是套用本软件名称和 Logo 的广告软件**。
+> 基于 [MusicFree](https://github.com/maotoumao/MusicFree)（作者：猫头猫 / maotoumao）修改，针对 Android 车机、特别是比亚迪 DiLink 做适配。
 >
-> 👎 速悦音乐基于本软件二次开发，改动点仅仅是内置插件、修改一些 UI 以及引流，**并未遵守本项目的开源协议，且拒绝沟通**。
+> 原项目采用 **AGPL-3.0** 协议，本仓库同样遵循 AGPL-3.0。感谢上游作者的开源工作，也感谢所有插件作者。
 
----
+## 下载
 
-## 特性
+- **最新车机版 Release**：<https://github.com/Dry-Earth/MusicFree/releases/latest>
+- 也可以在 [GitHub Actions](https://github.com/Dry-Earth/MusicFree/actions) 中下载每次构建的 APK 产物。
 
-- 插件化：本软件仅仅是一个播放器，本身**并不集成**任何平台的任何音源，所有的搜索、播放、歌单导入等功能全部基于**插件**。这也就意味着，**只要可以在互联网上搜索到的音源，只要有对应的插件，你都可以使用本软件进行搜索、播放等功能**。关于插件的详细说明请看插件一节。
+Release 里通常包含：
 
-- 插件支持的功能：搜索（音乐、专辑、作者）、播放、查看专辑、查看作者详细信息、导入单曲、导入歌单、获取歌词等。
+- `app-universal-release.apk`（通用，推荐）
+- `app-arm64-v8a-release.apk`
+- `app-armeabi-v7a-release.apk`
 
-- 定制化、无广告：本软件提供了浅色、深色模式；支持自定义背景；本软件基于 AGPL 协议开源，~~一个 star 做交易~~ 将会保持免费。
-- 隐私：所有的数据都存储在本地，本软件不会收集你的任何个人信息。
-- 歌词关联：你可以把两首歌的歌词关联起来，比如将歌曲 A 的歌词关联到歌曲 B，关联后 A、B 两首歌都将显示歌曲 B 的歌词。你也可以关联多首歌的歌词，如 A->B->C，这样 A、B、C 三首歌都将显示 C 的歌词。
+> 本车机版使用独立正式签名。如果之前装过官方版、其他签名版或 debug 测试版，需要先卸载再安装，否则会提示签名不一致。
 
-## 插件
+## 车机适配内容
 
-### 插件简介
+- 自动识别 BYD / DiLink / Android 车机 UI / 横屏大屏
+- 车机模式：横屏双栏、UI 放大、播放栏增加上一首/下一首大按钮
+- 侧边栏最大宽度限制，适配 1920px 宽车机
+- 存储权限适配：`targetSdk 29 + requestLegacyExternalStorage`，兼容无法申请「所有文件访问」的 DiLink
+- 通知权限、前台播放服务、电池优化白名单
+- 可选开机自启动
+- 导航播报时默认压低音量，而不是暂停音乐
+- 标准语音点歌接口：`MEDIA_PLAY_FROM_SEARCH` / `MEDIA_PLAY_FROM_URI`
+- 方控/广播控制接口，方便 Tasker 或自建方控调用
+- 保持屏幕常亮（可选）
 
-插件本质上是一个满足插件协议的 commonjs 模块。插件中定义了搜索（音乐、专辑、作者）、播放、查看专辑、作者详细信息、导入歌单、获取歌词等基本函数，插件的开发者只需要关心输入输出逻辑，至于分页、缓存等全都交给 MusicFree 控制即可。本软件通过插件来完成播放器的所有功能，这样解耦的设计也可以使得本软件可以专注于做一个功能完善的播放器，我直呼小而美。
+详细构建、安装和权限说明见 [CAR_BUILD.md](./CAR_BUILD.md)。
 
-插件开发文档可以参考 [这里](https://musicfree.catcat.work/plugin/introduction.html)
+## 语音助手与默认音乐
 
-需要注意的是：
+需要说明的是，车机适配不是“破解”比亚迪系统：
 
-- 如果你是使用第三方下载的插件，那么请自行鉴别插件的安全性（基本上看下没有奇怪的网络请求什么的就好了；自己写的最安全，*不要安装来路不明的东西*），防止恶意代码破坏。因为第三方恶意插件导致的可能的损失与本软件无关。
+- 小迪说「播放 / 暂停 / 上一首 / 下一首」：只要 MusicFree 正在播放、是当前媒体会话，通常可以通过标准 MediaSession 控制。
+- 小迪说「播放周杰伦」：仅当小迪使用标准 `MEDIA_PLAY_FROM_SEARCH` 接口时可用；如果它走比亚迪私有协议，需要抓取车机 `adb logcat` 后单独适配。
+- 设为默认音乐：Android 没有统一的默认音乐播放器设置，部分 DiLink 版本需要在「小迪设置 → 音乐」中手动选择。第三方 App 无法强制把自己设为默认，调试签名版本也可能不出现在系统可选列表中。
 
-- 插件使用过程中可能会产生某些和本软件无关的版权数据，插件、以及插件产生的任何数据与本软件无关，请使用者自行斟酌，及时删除数据，本软件不提倡也不会提供任何破解行为，你可以搭建自己的离线音乐仓库使用。
+## 权限说明
 
-### 插件使用
+| 权限 | 用途 |
+| --- | --- |
+| 存储 | 下载歌曲、缓存、导入本地音乐 |
+| 通知 | 播放控制通知 / 车机媒体卡片（Android 13+） |
+| 前台服务 / WAKE_LOCK | 后台和锁车后继续播放 |
+| 电池优化白名单 | 避免车机系统杀掉播放服务 |
+| 悬浮窗 | 桌面歌词（可选，部分车机不支持） |
+| 开机自启动 | 可选，是否生效取决于车机后台启动策略 |
 
-下载 app 之后，只需要在侧边栏设置-插件设置中安装插件即可。支持安装本地插件和从网络安装插件（支持解析.js 文件和.json 描述文件；已经写了几个示意的插件：[指路这个仓库](https://github.com/maotoumao/MusicFreePlugins)，不过可能功能不是很完善）；
+如果车机拒绝存储权限，在线播放、下载和缓存仍然可用，文件会保存在应用专属目录：
 
+`Android/data/fun.upup.musicfree.custom/files/`
 
-你可以直接点击从网络安装插件，然后输入<https://raw.gitcode.com/maotoumao/MusicFreePlugins/raw/master/plugins.json> ，点击确认即可安装。
+## 构建
 
-图文版详细使用说明可以参考公众号：[MusicFree 插件使用指南](https://mp.weixin.qq.com/s?__biz=MzkxOTM5MDI4MA==&mid=2247483875&idx=1&sn=aedf8bb909540634d927de7fd2b4b8b1&chksm=c1a390c4f6d419d233908bb781d418c6b9fd2ca82e9e93291e7c93b8ead3c50ca5ae39668212#rd)，或者站点： https://musicfree.catcat.work/usage/mobile/install-plugin.html
+```bash
+npm ci
+cd android
+./gradlew assembleRelease
+```
 
-## 下载地址
+更完整的签名、Secrets、模拟器调试和 BYD 安装说明见 [CAR_BUILD.md](./CAR_BUILD.md)。
 
-请转到发布页查看：[指路](https://github.com/maotoumao/MusicFree/releases) (如果打不开可以把 github 换成 gitcode)，公众号回复 Musicfree 也可以。
+## 致谢
 
-## Q&A
+- 上游项目：[maotoumao/MusicFree](https://github.com/maotoumao/MusicFree)
+- 上游作者：猫头猫（maotoumao）
+- 所有 MusicFree 插件作者
+- 所有参与测试和反馈的车友
 
-使用时遇到的常见问题可以看这里：[MusicFree 使用 Q&A](https://musicfree.catcat.work/qa/common.html)
+## License
 
-技术交流/一起写点有意思的东西/技术向的闲聊欢迎加群：[683467814](https://jq.qq.com/?_wv=1027&k=upVpi2k3)~ （不是答疑群）
-
-闲聊可以到 [QQ 频道](https://pd.qq.com/s/cyxnf0jj1)~
-
-## WIP
-
-如果有需要讨论的新需求，可以在公众号后台留言/提issue/或者去discussion开个话题。
-
-## 支持这个项目
-
-如果你喜欢这个项目，或者希望我可以持续维护下去，你可以通过以下任何一种方式支持我;)
-
-1. Star 这个项目，分享给你身边的人；
-2. 关注公众号👇或 b 站 [不想睡觉猫头猫](https://space.bilibili.com/12866223) 获取最新信息；
-3. 关注猫头猫的 [小红书](https://www.xiaohongshu.com/user/profile/5ce6085200000000050213a6?xhsshare=CopyLink&appuid=5ce6085200000000050213a6&apptime=1714394544)，虽然可能不会在这里更新软件相关的信息，但也算支持啦~
-
-![微信公众号](./src/assets/imgs/wechat_channel.jpg)
-
-感谢以下小伙伴的推荐，很意外也很惊喜 ~~~
-
-来自**果核剥壳**的安利~ <https://mp.weixin.qq.com/s/F6hMbLv_a-Ty0fPA_0P0Rg>
-
-来自**小棉袄**的安利~ <https://mp.weixin.qq.com/s/Fqe3o7vcTw0KDKoB-gsQfg>
-
-## ChangeLog
-
-[点击这里](./changelog.md)
-
----
-本项目仅供学习参考使用，基于 AGPL3.0 协议开源；请在符合法律法规的情况下合理使用本项目，禁止用于商业目的使用。
-
-## 应用截图
-
-**以下截图仅为 UI 样例，软件内部不提供任何音源，不代表实际使用时表现如下图。**
-#### 主界面
-
-<img src="./.imgs/main-v0.6.jpg" width="320px" alt="主界面">
-
-#### 侧边栏
-
-- 侧边栏
-
-<img src="./.imgs/sidebar-v0.6.jpg" width="320px" alt="侧边栏">
-
-- 基础设置
-
-<img src="./.imgs/basic-setting-v0.6.jpg" width="320px" alt="基础设置">
-
-- 主题设置
-
-<img src="./.imgs/theme-setting-v0.6.jpg" width="320px" alt="主题设置">
-
-#### 音乐相关
-
-- 歌单页
-
-<img src="./.imgs/song-sheet-v0.6.jpg" width="320px" alt="歌单页">
-
-- 歌单内检索
-
-<img src="./.imgs/search-in-sheet-v0.6.jpg" width="320px" alt="歌单内检索">
-
-- 播放页
-
-<img src="./.imgs/song-cover-v0.6.jpg" width="320px" alt="播放页">
-
-- 歌词页
-
-<img src="./.imgs/song-lrc-v0.6.jpg" width="320px" alt="歌词页">
-
-#### 搜索相关
-
-- 作者信息
-
-<img src="./.imgs/artist-detail-v0.6.jpg" width="320px" alt="作者信息">
-
-
-<details>
-
-
-<summary>以下是软件早期版本的 UI</summary>
-
-#### 主界面
-
-<img src="./.imgs/main.jpg" width="320px" alt="主界面">
-
-#### 侧边栏
-
-- 基础设置
-
-<img src="./.imgs/basic-setting.jpg" width="320px" alt="基础设置">
-
-- 主题设置
-
-<img src="./.imgs/theme-setting.jpg" width="320px" alt="主题设置">
-
-#### 音乐相关
-
-- 歌单页
-
-<img src="./.imgs/song-sheet.jpg" width="320px" alt="歌单页">
-
-- 歌单内检索
-
-<img src="./.imgs/search-in-sheet.jpg" width="320px" alt="歌单内检索">
-
-- 播放页
-
-<img src="./.imgs/song-cover.jpg" width="320px" alt="播放页">
-
-- 歌词页
-
-<img src="./.imgs/song-lrc.jpg" width="320px" alt="歌词页">
-
-#### 搜索相关
-
-- 作者信息
-
-<img src="./.imgs/artist-detail.jpg" width="320px" alt="作者信息">
-
-
-</details>
+本项目基于 MusicFree 修改，遵循 [AGPL-3.0](./LICENSE)。

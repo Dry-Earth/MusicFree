@@ -11,6 +11,9 @@ on:
         required: false
         default: 'custom'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -65,3 +68,23 @@ jobs:
           path: |
             android/app/build/outputs/apk/release/*.apk
           retention-days: 90
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: v0.6.2-car.1
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" \
+              --title "MusicFree 车机版 $RELEASE_TAG" \
+              --notes-file .github/car-release-notes.md
+          else
+            gh release create "$RELEASE_TAG" \
+              --target "$GITHUB_SHA" \
+              --title "MusicFree 车机版 $RELEASE_TAG" \
+              --notes-file .github/car-release-notes.md \
+              --latest
+          fi
+          gh release upload "$RELEASE_TAG" \
+            android/app/build/outputs/apk/release/*.apk \
+            --clobber

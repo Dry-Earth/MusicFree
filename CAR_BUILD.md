@@ -75,6 +75,7 @@ adb shell am broadcast -a fun.upup.musicfree.custom.CONTROL --es action pause
 
 - 更新检查地址已切换到本仓库（`Dry-Earth/MusicFree`），避免车机版被官方版更新覆盖。
 - 应用显示名称改为「MusicFree 车机版」，便于和手机版区分。
+- 每次 push 到 `master` 会自动构建，并更新 GitHub Release（tag：`v0.6.2-car.1`），APK 可直接从 Releases 页面下载。
 
 - 默认只打包 `arm64-v8a`、`armeabi-v7a`，减小车机安装包体积。
 - 没有 `android/keystore.properties` 时自动回退到仓库内的 `debug.keystore` 签名，保证 `assembleRelease` 开箱可构建。
