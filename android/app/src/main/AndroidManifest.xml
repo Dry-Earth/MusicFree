@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="fun.upup.musicfree.custom">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- 网络与播放 -->
     <uses-permission android:name="android.permission.INTERNET" />
