@@ -24,6 +24,7 @@ export default function CarPlayer(props: ICarPlayerProps) {
     const { t } = useI18N();
     const pagerRef = useRef<PagerView>(null);
     const [page, setPage] = useState(0);
+    const [coverBox, setCoverBox] = useState({ width: 0, height: 0 });
 
     return (
         <View style={styles.wrapper}>
@@ -65,9 +66,34 @@ export default function CarPlayer(props: ICarPlayerProps) {
                             setPage(event.nativeEvent.position)
                         }>
                         <View key="cover" style={styles.page}>
-                            <View style={styles.coverContainer}>
+                            <View
+                                style={styles.coverContainer}
+                                onLayout={event =>
+                                    setCoverBox({
+                                        width: event.nativeEvent.layout.width,
+                                        height: event.nativeEvent.layout.height,
+                                    })
+                                }>
                                 <FastImage
-                                    style={styles.cover}
+                                    style={[
+                                        styles.cover,
+                                        {
+                                            width: Math.max(
+                                                0,
+                                                Math.min(
+                                                    coverBox.width * 0.7,
+                                                    coverBox.height * 0.82,
+                                                ),
+                                            ),
+                                            height: Math.max(
+                                                0,
+                                                Math.min(
+                                                    coverBox.width * 0.7,
+                                                    coverBox.height * 0.82,
+                                                ),
+                                            ),
+                                        },
+                                    ]}
                                     source={musicItem.artwork}
                                     placeholderSource={ImgAsset.albumDefault}
                                 />
@@ -157,8 +183,6 @@ const styles = StyleSheet.create({
         padding: rpx(24),
     },
     cover: {
-        width: "70%",
-        aspectRatio: 1,
         borderRadius: rpx(18),
     },
     dots: {
