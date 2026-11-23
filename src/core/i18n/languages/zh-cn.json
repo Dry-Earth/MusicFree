@@ -481,5 +481,6 @@
     "dialog.autoStart.later": "暂不",
     "home.musicMenu": "音乐",
     "carSettings.noMusic": "还没有播放中的歌曲",
-    "carSettings.openPlaylist": "打开播放列表"
+    "carSettings.openPlaylist": "打开播放列表",
+    "common.back": "返回"
 }

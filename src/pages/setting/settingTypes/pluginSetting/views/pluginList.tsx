@@ -266,7 +266,11 @@ export default function PluginList() {
 
     return (
         <>
-            <AppBar menu={menuOptions}>{t("sidebar.pluginManagement")}</AppBar>
+            <AppBar
+                menu={menuOptions}
+                onBackPress={() => navigator.goBack()}>
+                {t("sidebar.pluginManagement")}
+            </AppBar>
             <HorizontalSafeAreaView style={style.wrapper}>
                 <>
                     {loading ? (

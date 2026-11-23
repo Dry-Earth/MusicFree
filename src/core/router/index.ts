@@ -1,6 +1,7 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useCallback } from "react";
 import { LogBox } from "react-native";
+import { useCarNav } from "@/core/router/carNavContext";
 
 LogBox.ignoreLogs([
     "Non-serializable values were found in the navigation state",
@@ -109,22 +110,48 @@ interface RouterParams extends RouterParamsBase {
 /** 路由参数Hook */
 export function useParams<T extends RoutePaths>(): RouterParams[T] {
     const route = useRoute<any>();
+    const carNav = useCarNav();
+
+    if (carNav) {
+        return carNav.currentParams as RouterParams[T];
+    }
 
     const routeParams = route?.params as RouterParams[T];
     return routeParams;
 }
 
-/** 导航 */
+/** 导航：车机中间栏内会推入车机栈，其他场景走根导航 */
 export function useNavigate() {
     const navigation = useNavigation<any>();
+    const carNav = useCarNav();
 
     const navigate = useCallback(function <T extends RoutePaths>(
         route: T,
         params?: RouterParams[T],
     ) {
-        navigation.navigate(route, params);
+        if (carNav) {
+            carNav.push(route, params);
+        } else {
+            navigation.navigate(route, params);
+        }
     },
-    []);
+    [carNav, navigation]);
 
     return navigate;
+}
+
+/** 返回：车机中间栏内只回退中间栏，不影响整个主页 */
+export function useGoBack() {
+    const navigation = useNavigation<any>();
+    const carNav = useCarNav();
+
+    return useCallback(() => {
+        if (carNav) {
+            if (carNav.canPop) {
+                carNav.pop();
+            }
+            return;
+        }
+        navigation.goBack();
+    }, [carNav, navigation]);
 }

@@ -15,7 +15,7 @@ import color from "color";
 import IconButton from "./iconButton";
 import globalStyle from "@/constants/globalStyle";
 import ThemeText from "./themeText";
-import { useNavigation } from "@react-navigation/native";
+import { useGoBack } from "@/core/router";
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -72,7 +72,7 @@ export default function AppBar(props: IAppBarProps) {
     } = props;
 
     const colors = useColors();
-    const navigation = useNavigation();
+    const goBack = useGoBack();
 
     const bgColor = color(colors.appBar ?? colors.primary).toString();
     const contentColor = _color ?? colors.appBarText;
@@ -113,7 +113,7 @@ export default function AppBar(props: IAppBarProps) {
                     onPress={
                         onBackPress ||
                         (() => {
-                            navigation.goBack();
+                            goBack();
                         })
                     }
                 />

@@ -481,5 +481,6 @@
     "dialog.autoStart.later": "Not now",
     "home.musicMenu": "Music",
     "carSettings.noMusic": "No song is playing",
-    "carSettings.openPlaylist": "Open playlist"
+    "carSettings.openPlaylist": "Open playlist",
+    "common.back": "Back"
 }

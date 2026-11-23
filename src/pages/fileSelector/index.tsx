@@ -7,11 +7,10 @@ import ThemeText from "@/components/base/themeText";
 import VerticalSafeAreaView from "@/components/base/verticalSafeAreaView";
 import globalStyle from "@/constants/globalStyle";
 import i18n from "@/core/i18n";
-import { useParams } from "@/core/router";
+import { useGoBack, useParams } from "@/core/router";
 import useColors from "@/hooks/useColors";
 import useHardwareBack from "@/hooks/useHardwareBack";
 import rpx from "@/utils/rpx";
-import { useNavigation } from "@react-navigation/native";
 import NativeUtils from "@/native/utils";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState, Pressable, StyleSheet, View } from "react-native";
@@ -58,7 +57,7 @@ export default function FileSelector() {
         () => checkedItems.map(_ => _.path),
         [checkedItems],
     );
-    const navigation = useNavigation();
+    const goBack = useGoBack();
     const colors = useColors();
     const [loading, setLoading] = useState(false);
     const [storageGranted, setStorageGranted] = useState(true);
@@ -179,7 +178,7 @@ export default function FileSelector() {
         if (_currentPath.parent !== null) {
             setCurrentPath(_currentPath.parent);
         } else {
-            navigation.goBack();
+            goBack();
         }
         return true;
     });
@@ -333,7 +332,7 @@ export default function FileSelector() {
                     if (checkedItems.length) {
                         const shouldBack = await onAction?.(checkedItems);
                         if (shouldBack) {
-                            navigation.goBack();
+                            goBack();
                         }
                     }
                 }}>

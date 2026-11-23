@@ -18,7 +18,7 @@ import useOrientation from "@/hooks/useOrientation";
 import useCarMode from "@/hooks/useCarMode";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 
-const CAR_DRAWER_MAX_WIDTH = 420;
+const CAR_DRAWER_MAX_WIDTH = 320;
 
 function Home() {
     const orientation = useOrientation();
@@ -42,7 +42,7 @@ function Home() {
             <HomeStatusBar />
             <HorizontalSafeAreaView style={globalStyle.flex1}>
                 <>
-                    <NavBar />
+                    {useCarHome ? null : <NavBar />}
                     {useCarHome ? (
                         <HomeBodyCar />
                     ) : orientation === "vertical" ? (

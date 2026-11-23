@@ -12,6 +12,7 @@ import { musicIsPaused } from "@/utils/trackUtils";
 import MusicInfo from "./musicInfo";
 import Icon from "@/components/base/icon.tsx";
 import useCarMode from "@/hooks/useCarMode";
+import { useCarNav } from "@/core/router/carNavContext";
 
 function CircularPlayBtn() {
     const progress = useProgress();
@@ -58,6 +59,7 @@ function CircularPlayBtn() {
     );
 }
 function MusicBar() {
+    const carNav = useCarNav();
     const musicItem = useCurrentMusic();
     const carMode = useCarMode();
 
@@ -79,6 +81,11 @@ function MusicBar() {
             hideSubscription.remove();
         };
     }, []);
+
+    // 车机中间栏内右侧已有固定播放器，不再渲染底部 MusicBar
+    if (carNav) {
+        return null;
+    }
 
     return (
         <>

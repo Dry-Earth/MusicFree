@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import rpx from "@/utils/rpx";
-import { useNavigation } from "@react-navigation/native";
+import { useGoBack } from "@/core/router";
 import Tag from "@/components/base/tag";
 import { fontSizeConst, fontWeightConst } from "@/constants/uiConst";
 import Share from "react-native-share";
@@ -10,7 +10,7 @@ import IconButton from "@/components/base/iconButton";
 import { useCurrentMusic } from "@/core/trackPlayer";
 
 export default function NavBar() {
-    const navigation = useNavigation();
+    const goBack = useGoBack();
     const musicItem = useCurrentMusic();
     // const {showShare} = useShare();
 
@@ -21,9 +21,7 @@ export default function NavBar() {
                 sizeType={"normal"}
                 color="white"
                 style={styles.button}
-                onPress={() => {
-                    navigation.goBack();
-                }}
+                onPress={goBack}
             />
             <View style={styles.headerContent}>
                 <Text numberOfLines={1} style={styles.headerTitleText}>
