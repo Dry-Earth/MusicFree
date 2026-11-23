@@ -2,7 +2,7 @@ package `fun`.upup.musicfree
 
 import android.content.Context
 import android.content.Intent
-import android.provider.SearchManager
+import android.app.SearchManager
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
