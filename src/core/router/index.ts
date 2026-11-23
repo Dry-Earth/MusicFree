@@ -42,6 +42,8 @@ export const ROUTE_PATH = {
     PLUGIN_SHEET_DETAIL: "plugin-sheet-detail",
     /** 历史记录 */
     HISTORY: "history",
+    /** 我的歌单 */
+    MY_SHEETS: "my-sheets",
     /** 自定义主题 */
     SET_CUSTOM_THEME: "set-custom-theme",
     /** 权限管理 */

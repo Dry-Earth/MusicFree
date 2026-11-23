@@ -2,6 +2,7 @@ import deviceInfoModule from "react-native-device-info";
 import AboutSetting from "./aboutSetting";
 import BackupSetting from "./backupSetting";
 import BasicSetting from "./basicSetting";
+import CarSetting from "./carSetting";
 import PluginSetting from "./pluginSetting";
 import ThemeSetting from "./themeSetting";
 
@@ -14,6 +15,11 @@ const settingTypes: Record<
         i18nKey: string;
     }
 > = {
+    car: {
+        title: "车机设置",
+        i18nKey: "sidebar.carSettings",
+        component: CarSetting,
+    },
     basic: {
         title: "基本设置",
         i18nKey: "sidebar.basicSettings",

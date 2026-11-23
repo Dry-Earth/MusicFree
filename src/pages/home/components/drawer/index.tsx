@@ -4,21 +4,15 @@ import ListItem from "@/components/base/listItem";
 import PageBackground from "@/components/base/pageBackground";
 import ThemeText from "@/components/base/themeText";
 import { showDialog } from "@/components/dialogs/useDialog";
-import { showPanel } from "@/components/panels/usePanel";
 import { useI18N } from "@/core/i18n";
 import { ROUTE_PATH, useNavigate } from "@/core/router";
 import TrackPlayer from "@/core/trackPlayer";
-import { checkUpdateAndShowResult } from "@/hooks/useCheckUpdate.ts";
 import NativeUtils from "@/native/utils";
 import rpx from "@/utils/rpx";
-import { useScheduleCloseCountDown } from "@/utils/scheduleClose";
-import timeformat from "@/utils/timeformat";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import React, { memo } from "react";
-import { BackHandler, Platform, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { default as DeviceInfo, default as deviceInfoModule } from "react-native-device-info";
-
-const ITEM_HEIGHT = rpx(108);
 
 interface ISettingOptions {
     icon: IIconName;
@@ -37,6 +31,13 @@ function HomeDrawer(props: any) {
     const { t, getSupportedLanguages, getLanguage, setLanguage } = useI18N();
 
     const basicSetting: ISettingOptions[] = [
+        {
+            icon: "identification",
+            title: t("sidebar.carSettings"),
+            onPress: () => {
+                navigateToSetting("car");
+            },
+        },
         {
             icon: "cog-8-tooth",
             title: t("sidebar.basicSettings"),
@@ -119,7 +120,6 @@ function HomeDrawer(props: any) {
                             {t("common.other")}
                         </ListItem.ListItemText>
                     </ListItem>
-                    <CountDownItem />
                     {otherSetting.map((item, index) => (
                         <ListItem
                             withHorizontalPadding
@@ -163,23 +163,6 @@ function HomeDrawer(props: any) {
 
                     <ListItem
                         withHorizontalPadding
-                        key={"update"}
-                        onPress={() => {
-                            checkUpdateAndShowResult(true);
-                        }}>
-                        <ListItem.ListItemIcon
-                            icon={"arrow-path"}
-                            width={rpx(48)}
-                        />
-                        <ListItem.Content title={t("sidebar.checkUpdate")} />
-                        <ListItem.ListItemText
-                            position="right"
-                            fontSize="subTitle">
-                            {`${t("sidebar.currentVersion")}${deviceInfoModule.getVersion()}`}
-                        </ListItem.ListItemText>
-                    </ListItem>
-                    <ListItem
-                        withHorizontalPadding
                         key={"about"}
                         onPress={() => {
                             navigateToSetting("about");
@@ -195,18 +178,6 @@ function HomeDrawer(props: any) {
                 </View>
 
                 <Divider />
-                <ListItem
-                    withHorizontalPadding
-                    onPress={() => {
-                        // 仅安卓生效
-                        BackHandler.exitApp();
-                    }}>
-                    <ListItem.ListItemIcon
-                        icon={"home-outline"}
-                        width={rpx(48)}
-                    />
-                    <ListItem.Content title={t("sidebar.backToDesktop")} />
-                </ListItem>
                 <ListItem
                     withHorizontalPadding
                     onPress={async () => {
@@ -249,31 +220,4 @@ const style = StyleSheet.create({
     cardContent: {
         paddingHorizontal: 0,
     },
-
-    /** 倒计时 */
-    countDownText: {
-        height: ITEM_HEIGHT,
-        textAlignVertical: "center",
-    },
 });
-
-function _CountDownItem() {
-    const countDown = useScheduleCloseCountDown();
-    const { t } = useI18N();
-
-    return (
-        <ListItem
-            withHorizontalPadding
-            onPress={() => {
-                showPanel("TimingClose");
-            }}>
-            <ListItem.ListItemIcon icon="alarm-outline" width={rpx(48)} />
-            <ListItem.Content title={t("sidebar.scheduleClose")} />
-            <ListItem.ListItemText position="right" fontSize="subTitle">
-                {countDown ? timeformat(countDown) : ""}
-            </ListItem.ListItemText>
-        </ListItem>
-    );
-}
-
-const CountDownItem = memo(_CountDownItem, () => true);

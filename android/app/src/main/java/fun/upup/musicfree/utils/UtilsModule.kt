@@ -122,21 +122,29 @@ class UtilsModule(context: ReactApplicationContext) : ReactContextBaseJavaModule
         }
     }
 
+    private fun carPrefs() =
+        reactContext.getSharedPreferences("musicfree_car", Context.MODE_PRIVATE)
+
     /** 开机自启动开关，BootReceiver 读取同一个 SharedPreferences */
     @ReactMethod
     fun setAutoStartOnBoot(enabled: Boolean) {
-        reactContext.getSharedPreferences("musicfree_car", Context.MODE_PRIVATE)
-            .edit()
-            .putBoolean("auto_start_on_boot", enabled)
-            .apply()
+        carPrefs().edit().putBoolean("auto_start_on_boot", enabled).apply()
     }
 
     @ReactMethod
     fun isAutoStartOnBootEnabled(promise: Promise) {
-        promise.resolve(
-            reactContext.getSharedPreferences("musicfree_car", Context.MODE_PRIVATE)
-                .getBoolean("auto_start_on_boot", false),
-        )
+        promise.resolve(carPrefs().getBoolean("auto_start_on_boot", false))
+    }
+
+    /** 全局显示大小（rpx 系数），需要重启应用生效 */
+    @ReactMethod
+    fun setUiScale(scale: Double) {
+        carPrefs().edit().putFloat("ui_scale", scale.toFloat()).apply()
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    fun getUiScale(): Double {
+        return carPrefs().getFloat("ui_scale", 1.0f).toDouble()
     }
 
     /** 打开系统默认应用设置；BYD 的默认音乐通常在「小迪设置 → 音乐」中 */

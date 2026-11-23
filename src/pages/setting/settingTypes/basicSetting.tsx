@@ -1,6 +1,4 @@
-import ColorBlock from "@/components/base/colorBlock";
 import ListItem from "@/components/base/listItem";
-import Paragraph from "@/components/base/paragraph";
 import ThemeSwitch from "@/components/base/switch";
 import ThemeText from "@/components/base/themeText";
 import { showDialog } from "@/components/dialogs/useDialog";
@@ -10,21 +8,15 @@ import pathConst from "@/constants/pathConst";
 import Config, { useAppConfig } from "@/core/appConfig";
 import { useI18N } from "@/core/i18n";
 import { ROUTE_PATH, useNavigate } from "@/core/router";
-import useColors from "@/hooks/useColors";
-import LyricUtil, { NativeTextAlignment } from "@/native/lyricUtil";
-import NativeUtils from "@/native/utils";
 import { AppConfigPropertyKey } from "@/types/core/config";
 import { clearCache, getCacheSize, sizeFormatter } from "@/utils/fileUtils";
-import { clearLog, getErrorLogContent } from "@/utils/log";
 import { qualityKeys } from "@/utils/qualities";
 import rpx from "@/utils/rpx";
 import Toast from "@/utils/toast";
-import Clipboard from "@react-native-clipboard/clipboard";
-import Slider from "@react-native-community/slider";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { SectionList, StyleSheet, TouchableOpacity, View } from "react-native";
 import { readdir } from "react-native-fs";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
+import { FlatList } from "react-native-gesture-handler";
 
 function createSwitch(
     title: string,
@@ -124,22 +116,13 @@ export default function BasicSetting() {
     const musicDetailDefault = useAppConfig("basic.musicDetailDefault");
     const musicDetailAwake = useAppConfig("basic.musicDetailAwake");
     const maxHistoryLen = useAppConfig("basic.maxHistoryLen");
-    const autoUpdatePlugin = useAppConfig("basic.autoUpdatePlugin");
-    const notCheckPluginVersion = useAppConfig("basic.notCheckPluginVersion");
-    const lazyLoadPlugin = useAppConfig("basic.lazyLoadPlugin");
     const associateLyricType = useAppConfig("basic.associateLyricType");
     const showExitOnNotification = useAppConfig("basic.showExitOnNotification");
     const musicOrderInLocalSheet = useAppConfig("basic.musicOrderInLocalSheet");
     const tryChangeSourceWhenPlayFail = useAppConfig("basic.tryChangeSourceWhenPlayFail");
-    const carMode = useAppConfig("basic.carMode");
-    const keepScreenOn = useAppConfig("basic.keepScreenOn");
-    const autoStartOnBoot = useAppConfig("basic.autoStartOnBoot");
 
     const { t } = useI18N();
 
-    const debugEnableErrorLog = useAppConfig("debug.errorLog");
-    const debugEnableTraceLog = useAppConfig("debug.traceLog");
-    const debugEnableDevLog = useAppConfig("debug.devLog");
 
     const navigate = useNavigate();
 
@@ -153,59 +136,6 @@ export default function BasicSetting() {
     }, []);
 
     const basicOptions = [
-        {
-            title: t("basicSettings.carMode"),
-            data: [
-                createRadio(
-                    t("basicSettings.carMode"),
-                    "basic.carMode",
-                    ["auto", "on", "off"],
-                    carMode ?? "auto",
-                    {
-                        auto: t("basicSettings.carMode.auto"),
-                        on: t("basicSettings.carMode.on"),
-                        off: t("basicSettings.carMode.off"),
-                    },
-                ),
-                createSwitch(
-                    t("basicSettings.keepScreenOn"),
-                    "basic.keepScreenOn",
-                    keepScreenOn ?? false,
-                ),
-                createSwitch(
-                    t("basicSettings.autoStartOnBoot"),
-                    "basic.autoStartOnBoot",
-                    autoStartOnBoot ?? false,
-                    newValue => {
-                        Config.setConfig("basic.autoStartOnBoot", newValue);
-                        NativeUtils?.setAutoStartOnBoot?.(newValue);
-                    },
-                ),
-                {
-                    title: t("basicSettings.openDefaultAppsSettings"),
-                    right: undefined,
-                    onPress: () => {
-                        NativeUtils?.openDefaultAppsSettings?.();
-                    },
-                },
-            ],
-            footer: (
-                <View>
-                    <ThemeText
-                        fontSize="description"
-                        fontColor="textSecondary"
-                        style={styles.sectionFooter}>
-                        {t("basicSettings.carMode.description")}
-                    </ThemeText>
-                    <ThemeText
-                        fontSize="description"
-                        fontColor="textSecondary"
-                        style={styles.sectionFooter}>
-                        {t("basicSettings.defaultMusicHint")}
-                    </ThemeText>
-                </View>
-            ),
-        },
         {
             title: t("basicSettings.common"),
             data: [
@@ -298,26 +228,6 @@ export default function BasicSetting() {
                         [SortType.Newest]: t("basicSettings.musicOrderInLocalSheet.newest"),
                         [SortType.Oldest]: t("basicSettings.musicOrderInLocalSheet.oldest"),
                     },
-                ),
-            ],
-        },
-        {
-            title: t("basicSettings.plugin"),
-            data: [
-                createSwitch(
-                    t("basicSettings.autoUpdatePlugin"),
-                    "basic.autoUpdatePlugin",
-                    autoUpdatePlugin ?? false,
-                ),
-                createSwitch(
-                    t("basicSettings.notCheckPluginVersion"),
-                    "basic.notCheckPluginVersion",
-                    notCheckPluginVersion ?? false,
-                ),
-                createSwitch(
-                    t("basicSettings.lazyLoadPlugin"),
-                    "basic.lazyLoadPlugin",
-                    lazyLoadPlugin ?? false,
                 ),
             ],
         },
@@ -473,11 +383,6 @@ export default function BasicSetting() {
             ],
         },
         {
-            title: t("basicSettings.lyric"),
-            data: [],
-            footer: <LyricSetting />,
-        },
-        {
             title: t("basicSettings.cache"),
             data: [
                 {
@@ -572,60 +477,6 @@ export default function BasicSetting() {
                 },
             ],
         },
-        {
-            title: t("basicSettings.developer"),
-            data: [
-                createSwitch(
-                    t("basicSettings.developer.errorLog"),
-                    "debug.errorLog",
-                    debugEnableErrorLog ?? false,
-                ),
-                createSwitch(
-                    t("basicSettings.developer.traceLog"),
-                    "debug.traceLog",
-                    debugEnableTraceLog ?? false,
-                ),
-                createSwitch(
-                    t("basicSettings.developer.devLog"),
-                    "debug.devLog",
-                    debugEnableDevLog ?? false,
-                ),
-                {
-                    title: t("basicSettings.developer.viewErrorLog"),
-                    right: undefined,
-                    async onPress() {
-                        // 获取日志文件夹
-                        const errorLogContent = await getErrorLogContent();
-                        showDialog("SimpleDialog", {
-                            title: t("dialog.errorLogTitle"),
-                            content: (
-                                <ScrollView>
-                                    <Paragraph>
-                                        {errorLogContent || t("dialog.errorLogNoRecord")}
-                                    </Paragraph>
-                                </ScrollView>
-                            ),
-                            cancelText: t("dialog.errorLogKnow"),
-                            okText: t("dialog.errorLogCopy"),
-                            onOk() {
-                                Clipboard.setString(errorLogContent);
-                                Toast.success(t("toast.copiedToClipboard"));
-                            },
-                        });
-                    },
-                },
-                {
-                    title: t("basicSettings.developer.clearLog"),
-                    right: undefined,
-                    async onPress() {
-                        try {
-                            await clearLog();
-                            Toast.success(t("toast.logCleared"));
-                        } catch { }
-                    },
-                },
-            ],
-        },
     ];
 
     return (
@@ -715,273 +566,5 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    sectionFooter: {
-        paddingHorizontal: rpx(24),
-        marginTop: rpx(12),
-        lineHeight: rpx(34),
-    },
 });
 
-function LyricSetting() {
-    /**
-     * // Lyric
-     *     "lyric.showStatusBarLyric": boolean;
-     *     "lyric.topPercent": number;
-     *     "lyric.leftPercent": number;
-     *     "lyric.align": number;
-     *     "lyric.color": string;
-     *     "lyric.backgroundColor": string;
-     *     "lyric.widthPercent": number;
-     *     "lyric.fontSize": number;
-     *     "lyric.detailFontSize": number;
-     *     "lyric.autoSearchLyric": boolean;
-     */
-    const showStatusBarLyric = useAppConfig("lyric.showStatusBarLyric");
-    const topPercent = useAppConfig("lyric.topPercent");
-    const leftPercent = useAppConfig("lyric.leftPercent");
-    const align = useAppConfig("lyric.align");
-    const color = useAppConfig("lyric.color");
-    const backgroundColor = useAppConfig("lyric.backgroundColor");
-    const widthPercent = useAppConfig("lyric.widthPercent");
-    const fontSize = useAppConfig("lyric.fontSize");
-    const enableAutoSearchLyric = useAppConfig("lyric.autoSearchLyric");
-
-
-
-    const colors = useColors();
-
-    const { t } = useI18N();
-
-    const autoSearchLyric = createSwitch(
-        t("basicSettings.lyric.autoSearchLyric"),
-        "lyric.autoSearchLyric",
-        enableAutoSearchLyric ?? false,
-    );
-
-    const openStatusBarLyric = createSwitch(
-        t("basicSettings.lyric.showStatusBarLyric"),
-        "lyric.showStatusBarLyric",
-        showStatusBarLyric ?? false,
-        async newValue => {
-            try {
-                if (newValue) {
-                    const hasPermission =
-                        await LyricUtil.checkSystemAlertPermission();
-
-                    if (hasPermission) {
-                        const statusBarLyricConfig = {
-                            topPercent: Config.getConfig("lyric.topPercent"),
-                            leftPercent: Config.getConfig("lyric.leftPercent"),
-                            align: Config.getConfig("lyric.align"),
-                            color: Config.getConfig("lyric.color"),
-                            backgroundColor: Config.getConfig("lyric.backgroundColor"),
-                            widthPercent: Config.getConfig("lyric.widthPercent"),
-                            fontSize: Config.getConfig("lyric.fontSize"),
-                        };
-                        LyricUtil.showStatusBarLyric(
-                            "MusicFree",
-                            statusBarLyricConfig ?? {}
-                        );
-                        Config.setConfig("lyric.showStatusBarLyric", true);
-                    } else {
-                        LyricUtil.requestSystemAlertPermission().finally(() => {
-                            Toast.warn(t("toast.noFloatWindowPermission"));
-                        });
-                    }
-                } else {
-                    LyricUtil.hideStatusBarLyric();
-                    Config.setConfig("lyric.showStatusBarLyric", false);
-                }
-            } catch { }
-        },
-    );
-
-    const alignStatusBarLyric = createRadio(
-        t("basicSettings.lyric.align"),
-        "lyric.align",
-        [
-            NativeTextAlignment.LEFT,
-            NativeTextAlignment.CENTER,
-            NativeTextAlignment.RIGHT,
-        ],
-        align ?? NativeTextAlignment.CENTER,
-        {
-            [NativeTextAlignment.LEFT]: t("basicSettings.lyric.align.left"),
-            [NativeTextAlignment.CENTER]: t("basicSettings.lyric.align.center"),
-            [NativeTextAlignment.RIGHT]: t("basicSettings.lyric.align.right"),
-        },
-        newVal => {
-            if (showStatusBarLyric) {
-                LyricUtil.setStatusBarLyricAlign(newVal as any);
-            }
-        },
-    );
-
-    return (
-        <View>
-            <ListItem
-                withHorizontalPadding
-                heightType="small"
-                onPress={autoSearchLyric.onPress}>
-                <ListItem.Content title={autoSearchLyric.title} />
-                {autoSearchLyric.right}
-            </ListItem>
-            <ListItem
-                withHorizontalPadding
-                heightType="small"
-                onPress={openStatusBarLyric.onPress}>
-                <ListItem.Content title={openStatusBarLyric.title} />
-                {openStatusBarLyric.right}
-            </ListItem>
-            <View style={lyricStyles.sliderContainer}>
-                <ThemeText>{t("basicSettings.lyric.leftRightDistance")}</ThemeText>
-                <Slider
-                    style={lyricStyles.slider}
-                    minimumTrackTintColor={colors.primary}
-                    maximumTrackTintColor={colors.text ?? "#999999"}
-                    thumbTintColor={colors.primary}
-                    minimumValue={0}
-                    step={0.01}
-                    value={leftPercent ?? 0.5}
-                    maximumValue={1}
-                    onValueChange={val => {
-                        if (showStatusBarLyric) {
-                            LyricUtil.setStatusBarLyricLeft(val);
-                        }
-                    }}
-                    onSlidingComplete={val => {
-                        Config.setConfig("lyric.leftPercent", val);
-                    }}
-                />
-            </View>
-            <View style={lyricStyles.sliderContainer}>
-                <ThemeText>{t("basicSettings.lyric.topBottomDistance")}</ThemeText>
-                <Slider
-                    style={lyricStyles.slider}
-                    minimumTrackTintColor={colors.primary}
-                    maximumTrackTintColor={colors.text ?? "#999999"}
-                    thumbTintColor={colors.primary}
-                    minimumValue={0}
-                    value={topPercent ?? 0}
-                    step={0.01}
-                    maximumValue={1}
-                    onValueChange={val => {
-                        if (showStatusBarLyric) {
-                            LyricUtil.setStatusBarLyricTop(val);
-                        }
-                    }}
-                    onSlidingComplete={val => {
-                        Config.setConfig("lyric.topPercent", val);
-                    }}
-                />
-            </View>
-            <View style={lyricStyles.sliderContainer}>
-                <ThemeText>{t("basicSettings.lyric.width")}</ThemeText>
-                <Slider
-                    style={lyricStyles.slider}
-                    minimumTrackTintColor={colors.primary}
-                    maximumTrackTintColor={colors.text ?? "#999999"}
-                    thumbTintColor={colors.primary}
-                    minimumValue={0}
-                    step={0.01}
-                    value={widthPercent ?? 0.5}
-                    maximumValue={1}
-                    onValueChange={val => {
-                        if (showStatusBarLyric) {
-                            LyricUtil.setStatusBarLyricWidth(val);
-                        }
-                    }}
-                    onSlidingComplete={val => {
-                        Config.setConfig("lyric.widthPercent", val);
-                    }}
-                />
-            </View>
-            <View style={lyricStyles.sliderContainer}>
-                <ThemeText>{t("basicSettings.lyric.fontSize")}</ThemeText>
-                <Slider
-                    style={lyricStyles.slider}
-                    minimumTrackTintColor={colors.primary}
-                    maximumTrackTintColor={colors.text ?? "#999999"}
-                    thumbTintColor={colors.primary}
-                    minimumValue={Math.round(rpx(18))}
-                    step={0.5}
-                    maximumValue={Math.round(rpx(56))}
-                    value={fontSize ?? Math.round(rpx(24))}
-                    onValueChange={val => {
-                        if (showStatusBarLyric) {
-                            LyricUtil.setStatusBarLyricFontSize(val);
-                        }
-                    }}
-                    onSlidingComplete={val => {
-                        Config.setConfig("lyric.fontSize", val);
-                    }}
-                />
-            </View>
-            <ListItem
-                withHorizontalPadding
-                heightType="small"
-                onPress={alignStatusBarLyric.onPress}>
-                <ListItem.Content title={alignStatusBarLyric.title} />
-                {alignStatusBarLyric.right}
-            </ListItem>
-            <ListItem
-                withHorizontalPadding
-                heightType="small"
-                onPress={() => {
-                    showPanel("ColorPicker", {
-                        closePanelWhenSelected: true,
-                        defaultColor: color ?? "transparent",
-                        onSelected(color) {
-                            if (showStatusBarLyric) {
-                                const colorStr = color.hexa();
-                                LyricUtil.setStatusBarColors(colorStr, null);
-                                Config.setConfig("lyric.color", colorStr);
-                            }
-                        },
-                    });
-                }}>
-                <ListItem.Content title={t("basicSettings.lyric.textColor")} />
-                <ColorBlock color={color ?? "#FFE9D2FF"} />
-            </ListItem>
-            <ListItem
-                withHorizontalPadding
-                heightType="small"
-                onPress={() => {
-                    showPanel("ColorPicker", {
-                        closePanelWhenSelected: true,
-                        defaultColor:
-                            backgroundColor ?? "transparent",
-                        onSelected(color) {
-                            if (showStatusBarLyric) {
-                                const colorStr = color.hexa();
-                                LyricUtil.setStatusBarColors(null, colorStr);
-                                Config.setConfig(
-                                    "lyric.backgroundColor",
-                                    colorStr,
-                                );
-                            }
-                        },
-                    });
-                }}>
-                <ListItem.Content title={t("basicSettings.lyric.backgroundColor")} />
-                <ColorBlock
-                    color={backgroundColor ?? "#84888153"}
-                />
-            </ListItem>
-        </View>
-    );
-}
-
-const lyricStyles = StyleSheet.create({
-    slider: {
-        flex: 1,
-        marginLeft: rpx(24),
-    },
-    sliderContainer: {
-        height: rpx(96),
-        width: "100%",
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: rpx(24),
-    },
-});

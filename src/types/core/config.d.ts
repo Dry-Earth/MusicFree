@@ -36,6 +36,8 @@ export interface IAppConfigProperties {
     "basic.carMode": "auto" | "on" | "off";
     "basic.keepScreenOn": boolean;
     "basic.autoStartOnBoot": boolean;
+    "basic.uiScale": number;
+    "basic.fontScale": number;
 
     // Lyric
     "lyric.showStatusBarLyric": boolean;

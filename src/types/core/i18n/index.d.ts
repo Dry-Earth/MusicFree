@@ -43,6 +43,7 @@ export interface ILanguageData {
     "common.listReachEnd": string; // 列表到底
 
     // 侧边栏相关
+    "sidebar.carSettings": string; // 车机设置
     "sidebar.basicSettings": string; // 基本设置
     "sidebar.pluginManagement": string; // 插件管理
     "sidebar.themeSettings": string; // 主题设置
@@ -59,6 +60,7 @@ export interface ILanguageData {
     "checkUpdate.error.latestVersion": string; // 当前已是最新版本
 
     // 首页相关
+    "home.musicMenu": string; // 音乐菜单
     "home.recommendSheet": string; // 推荐歌单
     "home.topList": string; // 榜单
     "home.playHistory": string; // 播放历史
@@ -427,6 +429,34 @@ export interface ILanguageData {
     "noPlugin.description": string; // 无插件描述
 
     // 对话框相关 - 存储权限
+    // 车机设置
+    "carSettings.displaySection": string;
+    "carSettings.systemSection": string;
+    "carSettings.carMode": string;
+    "carSettings.carModeDescription": string;
+    "carSettings.displayScale": string;
+    "carSettings.displayScaleDescription": string;
+    "carSettings.fontScale": string;
+    "carSettings.fontScaleDescription": string;
+    "carSettings.restartHint": string;
+    "carSettings.keepScreenOnDescription": string;
+    "carSettings.autoStartDescription": string;
+    "carSettings.autoStartHint": string;
+    "carSettings.permissionManagement": string;
+    "carSettings.permissionDescription": string;
+    "carSettings.resetScale": string;
+    "carSettings.resetScaleDescription": string;
+    "carSettings.bydDetected": string;
+    "carSettings.otherDevice": string;
+    "carSettings.noMusic": string;
+    "carSettings.openPlaylist": string;
+
+    // 对话框 - 开机自启动
+    "dialog.autoStart.title": string;
+    "dialog.autoStart.content": string;
+    "dialog.autoStart.enable": string;
+    "dialog.autoStart.later": string;
+
     "dialog.checkStorage.title": string; // 存储权限
     "dialog.checkStorage.content.0": string; // 存储权限内容0
     "dialog.checkStorage.content.1": string; // 存储权限内容1

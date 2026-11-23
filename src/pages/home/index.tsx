@@ -12,6 +12,7 @@ import globalStyle from "@/constants/globalStyle";
 import Theme from "@/core/theme";
 import { useAppConfig } from "@/core/appConfig";
 import HomeBody from "./components/homeBody";
+import HomeBodyCar from "./components/homeBodyCar";
 import HomeBodyHorizontal from "./components/homeBodyHorizontal";
 import useOrientation from "@/hooks/useOrientation";
 import useCarMode from "@/hooks/useCarMode";
@@ -23,6 +24,7 @@ function Home() {
     const orientation = useOrientation();
     const carMode = useCarMode();
     const keepScreenOn = useAppConfig("basic.keepScreenOn");
+    const useCarHome = carMode && orientation === "horizontal";
 
     // 车机模式：播放时保持屏幕常亮（默认关闭，可在设置中打开）
     useEffect(() => {
@@ -41,14 +43,16 @@ function Home() {
             <HorizontalSafeAreaView style={globalStyle.flex1}>
                 <>
                     <NavBar />
-                    {orientation === "vertical" ? (
+                    {useCarHome ? (
+                        <HomeBodyCar />
+                    ) : orientation === "vertical" ? (
                         <HomeBody />
                     ) : (
                         <HomeBodyHorizontal />
                     )}
                 </>
             </HorizontalSafeAreaView>
-            <MusicBar />
+            {useCarHome ? null : <MusicBar />}
         </SafeAreaView>
     );
 }

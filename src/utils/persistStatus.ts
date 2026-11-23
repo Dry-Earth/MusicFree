@@ -28,6 +28,8 @@ interface IPersistStatus {
     "app.skipVersion": string;
     /** 开屏弹窗 */
     "app.skipBootstrapStorageDialog": boolean;
+    /** 是否已询问过开机自启动 */
+    "app.askedAutoStart": boolean;
     /** 语言设置 */
     "app.language": string;
     /** 上次更新插件的时间 */

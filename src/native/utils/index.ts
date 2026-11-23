@@ -28,6 +28,8 @@ interface INativeUtils extends NativeModule {
     setAutoStartOnBoot: (enabled: boolean) => void;
     isAutoStartOnBootEnabled: () => Promise<boolean>;
     openDefaultAppsSettings: () => void;
+    setUiScale: (scale: number) => void;
+    getUiScale: () => number;
 }
 
 const NativeUtils = NativeModules.NativeUtils;

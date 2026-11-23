@@ -28,6 +28,8 @@ import bootstrapAtom from "./bootstrap.atom";
 import { getDefaultStore } from "jotai";
 import { MusicControl } from "@/utils/MusicControlModule";
 import { setupVoiceCommand } from "@/core/voiceCommand";
+import { setFontScale } from "@/core/uiScale";
+import { resolveCarMode } from "@/hooks/useCarMode";
 
 
 // 依赖管理
@@ -112,10 +114,37 @@ async function bootstrapImpl() {
     trace("配置初始化完成");
     logger.mark("配置初始化完成");
 
+    // 字体缩放（立即生效，不需要重启）
+    setFontScale(Config.getConfig("basic.fontScale") ?? 1);
+
     // 同步开机自启动标记（升级/清数据后自愈）
     NativeUtils?.setAutoStartOnBoot?.(
         Config.getConfig("basic.autoStartOnBoot") === true,
     );
+
+    // 车机首次启动时询问一次是否开机自启动（等存储弹窗处理完再问，避免叠在一起）
+    const storageReadyForAutoStart =
+        Platform.OS === "android"
+            ? await NativeUtils.checkStoragePermission().catch(() => false)
+            : false;
+    if (
+        storageReadyForAutoStart &&
+        resolveCarMode(Config.getConfig("basic.carMode")) &&
+        !Config.getConfig("basic.autoStartOnBoot") &&
+        !PersistStatus.get("app.askedAutoStart")
+    ) {
+        PersistStatus.set("app.askedAutoStart", true);
+        showDialog("SimpleDialog", {
+            title: i18n.t("dialog.autoStart.title"),
+            content: i18n.t("dialog.autoStart.content"),
+            cancelText: i18n.t("dialog.autoStart.later"),
+            okText: i18n.t("dialog.autoStart.enable"),
+            onOk() {
+                Config.setConfig("basic.autoStartOnBoot", true);
+                NativeUtils?.setAutoStartOnBoot?.(true);
+            },
+        });
+    }
 
     // 加载插件
     await PluginManager.setup();
