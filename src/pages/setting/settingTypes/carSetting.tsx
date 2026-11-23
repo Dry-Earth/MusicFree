@@ -191,7 +191,7 @@ export default function CarSetting() {
                 <ListItem
                     key={`${title}-${index}`}
                     withHorizontalPadding
-                    heightType="small"
+                    heightType="smallest"
                     onPress={row.onPress}>
                     <View style={styles.rowContent}>
                         <ListItem.Content

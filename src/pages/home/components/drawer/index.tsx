@@ -102,6 +102,7 @@ function HomeDrawer(props: any) {
                     {basicSetting.map((item, index) => (
                         <ListItem
                             withHorizontalPadding
+                            heightType="smallest"
                             key={"basic-setting-" + index}
                             onPress={item.onPress}>
                             <ListItem.ListItemIcon
@@ -123,6 +124,7 @@ function HomeDrawer(props: any) {
                     {otherSetting.map((item, index) => (
                         <ListItem
                             withHorizontalPadding
+                            heightType="smallest"
                             key={"other-setting-" + index}
                             onPress={item.onPress}>
                             <ListItem.ListItemIcon
@@ -132,7 +134,7 @@ function HomeDrawer(props: any) {
                             <ListItem.Content title={item.title} />
                         </ListItem>
                     ))}
-                    <ListItem withHorizontalPadding key='language' onPress={() => {
+                    <ListItem withHorizontalPadding heightType="smallest" key='language' onPress={() => {
                         showDialog("RadioDialog", {
                             "content": getSupportedLanguages().map(item => ({
                                 title: item.name,
@@ -163,6 +165,7 @@ function HomeDrawer(props: any) {
 
                     <ListItem
                         withHorizontalPadding
+                        heightType="smallest"
                         key={"about"}
                         onPress={() => {
                             navigateToSetting("about");
@@ -180,6 +183,7 @@ function HomeDrawer(props: any) {
                 <Divider />
                 <ListItem
                     withHorizontalPadding
+                    heightType="smallest"
                     onPress={async () => {
                         await TrackPlayer.reset();
                         NativeUtils.exitApp();
