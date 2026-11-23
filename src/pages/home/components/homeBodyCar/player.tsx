@@ -69,9 +69,15 @@ export default function CarPlayer(props: ICarPlayerProps) {
                             <View
                                 style={styles.coverContainer}
                                 onLayout={event =>
-                                    setCoverBox({
-                                        width: event.nativeEvent.layout.width,
-                                        height: event.nativeEvent.layout.height,
+                                    setCoverBox(prev => {
+                                        const width =
+                                            event.nativeEvent.layout.width;
+                                        const height =
+                                            event.nativeEvent.layout.height;
+                                        return prev.width === width &&
+                                            prev.height === height
+                                            ? prev
+                                            : { width, height };
                                     })
                                 }>
                                 <FastImage
