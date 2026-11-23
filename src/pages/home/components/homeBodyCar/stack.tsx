@@ -1,6 +1,6 @@
 import { routes } from "@/core/router/routes";
 import type { CarStackEntry } from "@/core/router/carNavContext";
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import Animated, {
     FadeIn,
@@ -15,15 +15,18 @@ interface ICarContentStackProps {
     direction: "forward" | "back";
 }
 
-const routeMap = new Map<string, (typeof routes)[number]["component"]>(
-    routes.map(route => [route.path, route.component]),
-);
-
 export default function CarContentStack(props: ICarContentStackProps) {
     const { stack, direction } = props;
     const top = stack[stack.length - 1];
     const isPanel = top.route === "car-panel";
-    const Component = isPanel ? null : routeMap.get(top.route);
+    // 延迟到 render 时再读 routes，避免 routes/home 的循环依赖在模块初始化时触发 TDZ
+    const Component = useMemo(
+        () =>
+            isPanel
+                ? null
+                : routes.find(route => route.path === top.route)?.component,
+        [isPanel, top.route],
+    );
 
     const entering = isPanel
         ? FadeIn.duration(160)
