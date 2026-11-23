@@ -13,7 +13,13 @@ import React, { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import PagerView from "react-native-pager-view";
 
-export default function CarPlayer() {
+interface ICarPlayerProps {
+    fullscreen: boolean;
+    onToggleFullscreen: () => void;
+}
+
+export default function CarPlayer(props: ICarPlayerProps) {
+    const { fullscreen, onToggleFullscreen } = props;
     const musicItem = useCurrentMusic();
     const { t } = useI18N();
     const pagerRef = useRef<PagerView>(null);
@@ -21,7 +27,7 @@ export default function CarPlayer() {
 
     return (
         <View style={styles.wrapper}>
-            <Background />
+            <Background transparent />
 
             <View style={styles.header}>
                 <View style={styles.headerText}>
@@ -29,16 +35,24 @@ export default function CarPlayer() {
                         color="#fff"
                         fontSize="title"
                         fontWeight="semibold"
-                        numberOfLines={1}>
+                        numberOfLines={1}
+                        style={styles.textShadow}>
                         {musicItem?.title ?? "MusicFree 车机版"}
                     </ThemeText>
                     <ThemeText
-                        color="rgba(255,255,255,0.65)"
+                        color="rgba(255,255,255,0.72)"
                         fontSize="subTitle"
-                        numberOfLines={1}>
+                        numberOfLines={1}
+                        style={styles.textShadow}>
                         {musicItem?.artist ?? ""}
                     </ThemeText>
                 </View>
+                <Icon
+                    name={fullscreen ? "arrow-long-left" : "arrows-left-right"}
+                    size={rpx(40)}
+                    color="#fff"
+                    onPress={onToggleFullscreen}
+                />
             </View>
 
             {musicItem ? (
@@ -117,7 +131,7 @@ const styles = StyleSheet.create({
         height: "100%",
         borderRadius: rpx(18),
         overflow: "hidden",
-        backgroundColor: "#101114",
+        backgroundColor: "transparent",
     },
     header: {
         height: rpx(96),
@@ -173,6 +187,12 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         marginTop: rpx(24),
+        textShadowColor: "rgba(0,0,0,0.4)",
+        textShadowRadius: rpx(6),
+    },
+    textShadow: {
+        textShadowColor: "rgba(0,0,0,0.45)",
+        textShadowRadius: rpx(6),
     },
     emptyActions: {
         flexDirection: "row",

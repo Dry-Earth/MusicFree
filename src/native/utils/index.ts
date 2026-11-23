@@ -30,6 +30,7 @@ interface INativeUtils extends NativeModule {
     openDefaultAppsSettings: () => void;
     setUiScale: (scale: number) => void;
     getUiScale: () => number;
+    restartApp: () => void;
 }
 
 const NativeUtils = NativeModules.NativeUtils;

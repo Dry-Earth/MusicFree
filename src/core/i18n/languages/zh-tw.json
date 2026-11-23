@@ -482,5 +482,9 @@
     "home.musicMenu": "音樂",
     "carSettings.noMusic": "還沒有播放中的歌曲",
     "carSettings.openPlaylist": "開啟播放清單",
-    "common.back": "返回"
+    "common.back": "返回",
+    "carSettings.restartTitle": "需要重新啟動",
+    "carSettings.restartContent": "顯示大小會在重新啟動應用程式後生效，是否立即重新啟動？",
+    "carSettings.restartNow": "立即重新啟動",
+    "carSettings.restartLater": "稍後"
 }

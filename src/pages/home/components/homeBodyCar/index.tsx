@@ -5,8 +5,7 @@ import rpx from "@/utils/rpx";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import CarRail from "./rail";
-import type { CarCategory } from "@/core/router/carNavContext";
+import CarMenu from "./menu";
 import CarContentStack from "./stack";
 import CarPlayer from "./player";
 
@@ -20,16 +19,22 @@ function createEntry(route: string, params?: any): CarStackEntry {
     };
 }
 
-function createPanel(category: CarCategory): CarStackEntry {
-    return createEntry("car-panel", { category });
-}
+const contentRatioMap: Record<string, number> = {
+    [ROUTE_PATH.SEARCH_PAGE]: 0.46,
+    [ROUTE_PATH.LOCAL]: 0.44,
+    [ROUTE_PATH.MY_SHEETS]: 0.46,
+    [ROUTE_PATH.SETTING]: 0.4,
+    [ROUTE_PATH.PERMISSIONS]: 0.4,
+    [ROUTE_PATH.HISTORY]: 0.42,
+    [ROUTE_PATH.RECOMMEND_SHEETS]: 0.44,
+    [ROUTE_PATH.TOP_LIST]: 0.42,
+};
 
 export default function HomeBodyCar() {
     const { width } = useWindowDimensions();
-    const [category, setCategory] = useState<CarCategory>("music");
-    const [stack, setStack] = useState<CarStackEntry[]>([
-        createPanel("music"),
-    ]);
+    const [collapsed, setCollapsed] = useState(false);
+    const [fullscreen, setFullscreen] = useState(false);
+    const [stack, setStack] = useState<CarStackEntry[]>([]);
     const [direction, setDirection] = useState<"forward" | "back">("forward");
     const stackRef = useRef(stack);
     stackRef.current = stack;
@@ -41,63 +46,81 @@ export default function HomeBodyCar() {
 
     const pop = useCallback(() => {
         if (stackRef.current.length <= 1) {
+            setDirection("back");
+            setStack([]);
+            setCollapsed(false);
             return;
         }
         setDirection("back");
         setStack(prev => prev.slice(0, -1));
     }, []);
 
-    const selectCategory = useCallback((nextCategory: CarCategory) => {
-        setCategory(nextCategory);
+    const openRoute = useCallback((route: string, params?: any) => {
+        setCollapsed(true);
         setDirection("forward");
-        setStack([createPanel(nextCategory)]);
+        setStack([createEntry(route, params)]);
     }, []);
 
-    const canPop = stack.length > 1;
+    const canPop = stack.length > 0;
     const currentParams = stack[stack.length - 1]?.params;
+    const topRoute = stack[stack.length - 1]?.route;
+    const activeRoute = stack[0]?.route;
 
     useHardwareBack(() => {
-        if (stackRef.current.length > 1) {
+        if (fullscreen) {
+            setFullscreen(false);
+            return true;
+        }
+        if (stackRef.current.length > 0) {
             pop();
             return true;
         }
         return false;
-    }, [pop]);
+    }, [fullscreen, pop]);
 
     const navValue = useMemo(
         () => ({
             stack,
-            category,
             currentParams,
             canPop,
             push,
             pop,
-            selectCategory,
         }),
-        [stack, category, currentParams, canPop, push, pop, selectCategory],
+        [stack, currentParams, canPop, push, pop],
     );
 
-    const contentWidth = canPop
-        ? Math.min(rpx(380), width * 0.46)
-        : Math.min(rpx(300), width * 0.38);
+    const ratio = stack.length > 1 ? 0.48 : (contentRatioMap[topRoute ?? ""] ?? 0.42);
+    const contentWidth = Math.min(
+        width * 0.52,
+        Math.max(rpx(320), width * ratio),
+    );
 
     return (
         <CarNavContext.Provider value={navValue}>
             <View style={styles.wrapper}>
-                <CarRail
-                    category={category}
-                    onSelectCategory={selectCategory}
-                    canPop={canPop}
-                    onBack={pop}
-                    onOpenPermission={() => push(ROUTE_PATH.PERMISSIONS)}
-                />
-                <Animated.View
-                    layout={LinearTransition.duration(180)}
-                    style={[styles.content, { width: contentWidth }]}>
-                    <CarContentStack stack={stack} direction={direction} />
-                </Animated.View>
+                {!fullscreen ? (
+                    <CarMenu
+                        collapsed={collapsed}
+                        activeRoute={activeRoute}
+                        canPop={canPop}
+                        onBack={pop}
+                        onSelect={openRoute}
+                    />
+                ) : null}
+
+                {!fullscreen && stack.length > 0 ? (
+                    <Animated.View
+                        layout={LinearTransition.duration(180)}
+                        style={[styles.content, { width: contentWidth }]}>
+                        <CarContentStack stack={stack} direction={direction} />
+                    </Animated.View>
+                ) : null}
+
                 <View style={styles.player}>
-                    <CarPlayer />
+                    <CarPlayer
+                        fullscreen={fullscreen}
+                        onToggleFullscreen={() => setFullscreen(value => !value)}
+                    />
                 </View>
             </View>
         </CarNavContext.Provider>
@@ -117,7 +140,7 @@ const styles = StyleSheet.create({
     },
     player: {
         flex: 1,
-        paddingLeft: rpx(4),
+        paddingLeft: rpx(8),
         paddingRight: rpx(12),
         paddingBottom: rpx(12),
     },

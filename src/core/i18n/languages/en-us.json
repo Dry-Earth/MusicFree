@@ -482,5 +482,9 @@
     "home.musicMenu": "Music",
     "carSettings.noMusic": "No song is playing",
     "carSettings.openPlaylist": "Open playlist",
-    "common.back": "Back"
+    "common.back": "Back",
+    "carSettings.restartTitle": "Restart required",
+    "carSettings.restartContent": "Display size will take effect after restarting the app. Restart now?",
+    "carSettings.restartNow": "Restart now",
+    "carSettings.restartLater": "Later"
 }

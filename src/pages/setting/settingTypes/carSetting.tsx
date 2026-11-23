@@ -108,7 +108,13 @@ export default function CarSetting() {
             value => {
                 Config.setConfig("basic.uiScale", value);
                 NativeUtils?.setUiScale?.(value);
-                Toast.success(t("carSettings.restartHint"));
+                showDialog("SimpleDialog", {
+                    title: t("carSettings.restartTitle"),
+                    content: t("carSettings.restartContent"),
+                    okText: t("carSettings.restartNow"),
+                    cancelText: t("carSettings.restartLater"),
+                    onOk: () => NativeUtils?.restartApp?.(),
+                });
             },
         ),
         createRadio(
@@ -161,7 +167,13 @@ export default function CarSetting() {
                 Config.setConfig("basic.fontScale", 1);
                 NativeUtils?.setUiScale?.(1);
                 setFontScale(1);
-                Toast.success(t("carSettings.restartHint"));
+                showDialog("SimpleDialog", {
+                    title: t("carSettings.restartTitle"),
+                    content: t("carSettings.restartContent"),
+                    okText: t("carSettings.restartNow"),
+                    cancelText: t("carSettings.restartLater"),
+                    onOk: () => NativeUtils?.restartApp?.(),
+                });
             },
         },
     ];
