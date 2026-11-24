@@ -45,18 +45,14 @@ export default function CarPlayer(props: ICarPlayerProps) {
                         {musicItem?.artist ?? ""}
                     </ThemeText>
                 </View>
-                {musicItem ? (
-                    <Icon
-                        name={
-                            fullscreen
-                                ? "arrow-long-left"
-                                : "arrows-left-right"
-                        }
-                        size={rpx(40)}
-                        color="#fff"
-                        onPress={onToggleFullscreen}
-                    />
-                ) : null}
+                <Icon
+                    name={
+                        fullscreen ? "arrow-long-left" : "arrows-left-right"
+                    }
+                    size={rpx(40)}
+                    color="#fff"
+                    onPress={onToggleFullscreen}
+                />
             </View>
 
             {musicItem ? (
