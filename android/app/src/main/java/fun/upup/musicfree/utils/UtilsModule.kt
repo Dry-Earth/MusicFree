@@ -14,7 +14,6 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import `fun`.upup.musicfree.MainActivity
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -146,35 +145,6 @@ class UtilsModule(context: ReactApplicationContext) : ReactContextBaseJavaModule
     @ReactMethod(isBlockingSynchronousMethod = true)
     fun getUiScale(): Double {
         return carPrefs().getFloat("ui_scale", 1.0f).toDouble()
-    }
-
-    /** 显示大小修改后立即重启应用（延时拉起，确保进程已退出） */
-    @ReactMethod
-    fun restartApp() {
-        try {
-            val intent = Intent(reactContext, MainActivity::class.java).apply {
-                addFlags(
-                    Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK,
-                )
-            }
-            val pendingIntent = android.app.PendingIntent.getActivity(
-                reactContext,
-                0,
-                intent,
-                android.app.PendingIntent.FLAG_CANCEL_CURRENT or
-                    android.app.PendingIntent.FLAG_IMMUTABLE,
-            )
-            val alarmManager =
-                reactContext.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
-            alarmManager.set(
-                android.app.AlarmManager.RTC,
-                System.currentTimeMillis() + 500,
-                pendingIntent,
-            )
-        } catch (_: Exception) {
-        }
-        android.os.Process.killProcess(android.os.Process.myPid())
     }
 
     /** 打开系统默认应用设置；BYD 的默认音乐通常在「小迪设置 → 音乐」中 */

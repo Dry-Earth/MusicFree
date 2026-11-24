@@ -1,16 +1,14 @@
 import { routes } from "@/core/router/routes";
 import type { CarStackEntry } from "@/core/router/carNavContext";
 import React, { useMemo } from "react";
-import { StyleSheet } from "react-native";
-import Animated, { SlideInLeft, SlideInRight } from "react-native-reanimated";
+import { StyleSheet, View } from "react-native";
 
 interface ICarContentStackProps {
     stack: CarStackEntry[];
-    direction: "forward" | "back";
 }
 
 export default function CarContentStack(props: ICarContentStackProps) {
-    const { stack, direction } = props;
+    const { stack } = props;
     const top = stack[stack.length - 1];
 
     // 延迟到 render 时再读 routes，避免 routes/home 的循环依赖在模块初始化时触发 TDZ
@@ -26,15 +24,10 @@ export default function CarContentStack(props: ICarContentStackProps) {
         return null;
     }
 
-    const entering =
-        direction === "back"
-            ? SlideInLeft.duration(220)
-            : SlideInRight.duration(220);
-
     return (
-        <Animated.View key={top.key} entering={entering} style={styles.wrapper}>
+        <View style={styles.wrapper}>
             {Component ? <Component /> : null}
-        </Animated.View>
+        </View>
     );
 }
 

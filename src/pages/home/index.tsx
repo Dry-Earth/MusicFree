@@ -18,7 +18,7 @@ import useOrientation from "@/hooks/useOrientation";
 import useCarMode from "@/hooks/useCarMode";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 
-const CAR_DRAWER_MAX_WIDTH = 320;
+const CAR_DRAWER_MAX_WIDTH = 420;
 
 function Home() {
     const orientation = useOrientation();

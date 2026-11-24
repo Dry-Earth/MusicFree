@@ -462,9 +462,9 @@
     "carSettings.carMode": "Car mode",
     "carSettings.carModeDescription": "Auto-detect BYD/DiLink/large screens and enable the car home and larger layout",
     "carSettings.displayScale": "Display size",
-    "carSettings.displayScaleDescription": "Scale the whole UI and buttons. Requires an app restart (90%~100% recommended on 12-inch screens)",
+    "carSettings.displayScaleDescription": "Scale the whole UI and buttons from 60% to 150%; requires an app restart",
     "carSettings.fontScale": "Font size",
-    "carSettings.fontScaleDescription": "Adjust text size only, takes effect immediately",
+    "carSettings.fontScaleDescription": "Adjust text size from 70% to 150%, takes effect immediately",
     "carSettings.restartHint": "Saved. Display size will take effect after restarting the app",
     "carSettings.keepScreenOnDescription": "Keep the screen on while playing in car mode",
     "carSettings.autoStartDescription": "Open MusicFree on boot if the head unit allows autostart",
@@ -482,9 +482,5 @@
     "home.musicMenu": "Music",
     "carSettings.noMusic": "No song is playing",
     "carSettings.openPlaylist": "Open playlist",
-    "common.back": "Back",
-    "carSettings.restartTitle": "Restart required",
-    "carSettings.restartContent": "Display size will take effect after restarting the app. Restart now?",
-    "carSettings.restartNow": "Restart now",
-    "carSettings.restartLater": "Later"
+    "common.back": "Back"
 }

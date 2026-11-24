@@ -1,4 +1,5 @@
 import Icon, { IIconName } from "@/components/base/icon.tsx";
+import ListItem from "@/components/base/listItem";
 import ThemeText from "@/components/base/themeText";
 import { useI18N } from "@/core/i18n";
 import { ROUTE_PATH } from "@/core/router";
@@ -112,44 +113,44 @@ export default function CarMenu(props: ICarMenuProps) {
         return activeRoute === item.key;
     };
 
-    const renderItem = (item: IMenuItem) => {
+    const renderExpanded = (item: IMenuItem) => {
         const active = isActive(item);
-        const color = active ? colors.primary : colors.text;
+        return (
+            <ListItem
+                key={item.key}
+                withHorizontalPadding
+                heightType="smallest"
+                onPress={() => handleItem(item)}>
+                <ListItem.ListItemIcon
+                    icon={item.icon}
+                    width={rpx(44)}
+                />
+                <ListItem.Content title={item.title} />
+                {active ? (
+                    <View
+                        style={[
+                            styles.activeBar,
+                            { backgroundColor: colors.primary },
+                        ]}
+                    />
+                ) : null}
+            </ListItem>
+        );
+    };
 
-        if (collapsed) {
-            return (
-                <Pressable
-                    key={item.key}
-                    accessibilityLabel={item.title}
-                    onPress={() => handleItem(item)}
-                    style={styles.collapsedItem}>
-                    <Icon name={item.icon} size={rpx(40)} color={color} />
-                    {active ? (
-                        <View
-                            style={[
-                                styles.activeBar,
-                                { backgroundColor: colors.primary },
-                            ]}
-                        />
-                    ) : null}
-                </Pressable>
-            );
-        }
-
+    const renderCollapsed = (item: IMenuItem) => {
+        const active = isActive(item);
         return (
             <Pressable
                 key={item.key}
                 accessibilityLabel={item.title}
                 onPress={() => handleItem(item)}
-                style={styles.expandedItem}>
-                <Icon name={item.icon} size={rpx(38)} color={color} />
-                <ThemeText
-                    fontSize="content"
-                    color={active ? colors.primary : undefined}
-                    style={styles.expandedText}
-                    numberOfLines={1}>
-                    {item.title}
-                </ThemeText>
+                style={styles.collapsedItem}>
+                <Icon
+                    name={item.icon}
+                    size={rpx(40)}
+                    color={active ? colors.primary : colors.text}
+                />
                 {active ? (
                     <View
                         style={[
@@ -161,6 +162,20 @@ export default function CarMenu(props: ICarMenuProps) {
             </Pressable>
         );
     };
+
+    const renderGroup = (title: string, items: IMenuItem[]) => (
+        <View style={styles.group}>
+            {!collapsed ? (
+                <ThemeText
+                    fontSize="description"
+                    fontColor="textSecondary"
+                    style={styles.groupTitle}>
+                    {title}
+                </ThemeText>
+            ) : null}
+            {items.map(collapsed ? renderCollapsed : renderExpanded)}
+        </View>
+    );
 
     return (
         <ScrollView
@@ -178,34 +193,15 @@ export default function CarMenu(props: ICarMenuProps) {
                     />
                 </Pressable>
             ) : null}
-            {!collapsed ? (
-                <ThemeText
-                    fontSize="description"
-                    fontColor="textSecondary"
-                    style={styles.groupTitle}>
-                    {t("home.musicMenu")}
-                </ThemeText>
-            ) : null}
-            {musicMenu.map(renderItem)}
-
-            {!collapsed ? (
-                <ThemeText
-                    fontSize="description"
-                    fontColor="textSecondary"
-                    style={styles.groupTitle}>
-                    {t("common.setting")}
-                </ThemeText>
-            ) : (
-                <View style={styles.groupGap} />
-            )}
-            {settingMenu.map(renderItem)}
+            {renderGroup(t("home.musicMenu"), musicMenu)}
+            {renderGroup(t("common.setting"), settingMenu)}
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     wrapper: {
-        width: rpx(280),
+        width: rpx(300),
         flexGrow: 0,
         flexShrink: 0,
         height: "100%",
@@ -213,23 +209,16 @@ const styles = StyleSheet.create({
     wrapperCollapsed: {
         width: rpx(80),
     },
+    group: {
+        marginTop: rpx(24),
+    },
     groupTitle: {
         paddingHorizontal: rpx(24),
-        height: rpx(52),
+        height: rpx(48),
         textAlignVertical: "center",
     },
-    expandedItem: {
-        height: rpx(72),
-        paddingHorizontal: rpx(24),
-        flexDirection: "row",
-        alignItems: "center",
-    },
-    expandedText: {
-        marginLeft: rpx(16),
-        flex: 1,
-    },
     collapsedItem: {
-        height: rpx(64),
+        height: rpx(68),
         alignItems: "center",
         justifyContent: "center",
     },
@@ -239,8 +228,5 @@ const styles = StyleSheet.create({
         width: rpx(4),
         height: rpx(26),
         borderRadius: rpx(2),
-    },
-    groupGap: {
-        height: rpx(12),
     },
 });

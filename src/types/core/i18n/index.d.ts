@@ -440,10 +440,6 @@ export interface ILanguageData {
     "carSettings.fontScale": string;
     "carSettings.fontScaleDescription": string;
     "carSettings.restartHint": string;
-    "carSettings.restartTitle": string;
-    "carSettings.restartContent": string;
-    "carSettings.restartNow": string;
-    "carSettings.restartLater": string;
     "carSettings.keepScreenOnDescription": string;
     "carSettings.autoStartDescription": string;
     "carSettings.autoStartHint": string;

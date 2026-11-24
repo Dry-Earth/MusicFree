@@ -82,7 +82,6 @@ function MusicBar() {
         };
     }, []);
 
-    // 车机中间栏内右侧已有固定播放器，不再渲染底部 MusicBar
     if (carNav) {
         return null;
     }

@@ -83,8 +83,8 @@ export default function CarSetting() {
             return acc;
         }, {});
 
-    const displayScales = [0.8, 0.9, 1, 1.1, 1.2];
-    const fontScales = [0.85, 0.9, 1, 1.1, 1.2];
+    const displayScales = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5];
+    const fontScales = [0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5];
 
     const displaySection: ISettingRow[] = [
         createRadio(
@@ -108,13 +108,7 @@ export default function CarSetting() {
             value => {
                 Config.setConfig("basic.uiScale", value);
                 NativeUtils?.setUiScale?.(value);
-                showDialog("SimpleDialog", {
-                    title: t("carSettings.restartTitle"),
-                    content: t("carSettings.restartContent"),
-                    okText: t("carSettings.restartNow"),
-                    cancelText: t("carSettings.restartLater"),
-                    onOk: () => NativeUtils?.restartApp?.(),
-                });
+                Toast.success(t("carSettings.restartHint"));
             },
         ),
         createRadio(
@@ -167,13 +161,7 @@ export default function CarSetting() {
                 Config.setConfig("basic.fontScale", 1);
                 NativeUtils?.setUiScale?.(1);
                 setFontScale(1);
-                showDialog("SimpleDialog", {
-                    title: t("carSettings.restartTitle"),
-                    content: t("carSettings.restartContent"),
-                    okText: t("carSettings.restartNow"),
-                    cancelText: t("carSettings.restartLater"),
-                    onOk: () => NativeUtils?.restartApp?.(),
-                });
+                Toast.success(t("carSettings.restartHint"));
             },
         },
     ];
@@ -191,7 +179,7 @@ export default function CarSetting() {
                 <ListItem
                     key={`${title}-${index}`}
                     withHorizontalPadding
-                    heightType="smallest"
+                    heightType="small"
                     onPress={row.onPress}>
                     <View style={styles.rowContent}>
                         <ListItem.Content

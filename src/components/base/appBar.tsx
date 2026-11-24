@@ -16,7 +16,6 @@ import IconButton from "./iconButton";
 import globalStyle from "@/constants/globalStyle";
 import ThemeText from "./themeText";
 import { useGoBack } from "@/core/router";
-import { useCarNav } from "@/core/router/carNavContext";
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -74,12 +73,8 @@ export default function AppBar(props: IAppBarProps) {
 
     const colors = useColors();
     const goBack = useGoBack();
-    const carNav = useCarNav();
 
-    // 车机中间栏内默认使用透明标题栏
-    const bgColor = carNav
-        ? "transparent"
-        : color(colors.appBar ?? colors.primary).toString();
+    const bgColor = color(colors.appBar ?? colors.primary).toString();
     const contentColor = _color ?? colors.appBarText;
 
     const [showMenu, setShowMenu] = useState(false);

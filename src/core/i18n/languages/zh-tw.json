@@ -462,9 +462,9 @@
     "carSettings.carMode": "車機模式",
     "carSettings.carModeDescription": "自動識別 BYD/DiLink/大螢幕，開啟車機首頁和放大佈局",
     "carSettings.displayScale": "顯示大小",
-    "carSettings.displayScaleDescription": "整體介面和按鈕縮放，修改後需重新啟動應用程式（12 吋螢幕建議 90%~100%）",
+    "carSettings.displayScaleDescription": "整體介面和按鈕縮放，範圍 60%~150%，修改後需重新啟動應用程式",
     "carSettings.fontScale": "字體大小",
-    "carSettings.fontScaleDescription": "只調整文字大小，立即生效",
+    "carSettings.fontScaleDescription": "只調整文字大小，範圍 70%~150%，立即生效",
     "carSettings.restartHint": "已儲存，顯示大小將在重新啟動應用程式後生效",
     "carSettings.keepScreenOnDescription": "車機模式下播放時保持螢幕常亮",
     "carSettings.autoStartDescription": "開機後自動開啟 MusicFree，需車機允許自啟動",
@@ -482,9 +482,5 @@
     "home.musicMenu": "音樂",
     "carSettings.noMusic": "還沒有播放中的歌曲",
     "carSettings.openPlaylist": "開啟播放清單",
-    "common.back": "返回",
-    "carSettings.restartTitle": "需要重新啟動",
-    "carSettings.restartContent": "顯示大小會在重新啟動應用程式後生效，是否立即重新啟動？",
-    "carSettings.restartNow": "立即重新啟動",
-    "carSettings.restartLater": "稍後"
+    "common.back": "返回"
 }

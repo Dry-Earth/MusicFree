@@ -4,7 +4,6 @@ import useHardwareBack from "@/hooks/useHardwareBack";
 import rpx from "@/utils/rpx";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
-import Animated, { LinearTransition } from "react-native-reanimated";
 import CarMenu from "./menu";
 import CarContentStack from "./stack";
 import CarPlayer from "./player";
@@ -35,29 +34,24 @@ export default function HomeBodyCar() {
     const [collapsed, setCollapsed] = useState(false);
     const [fullscreen, setFullscreen] = useState(false);
     const [stack, setStack] = useState<CarStackEntry[]>([]);
-    const [direction, setDirection] = useState<"forward" | "back">("forward");
     const stackRef = useRef(stack);
     stackRef.current = stack;
 
     const push = useCallback((route: string, params?: any) => {
-        setDirection("forward");
         setStack(prev => [...prev, createEntry(route, params)]);
     }, []);
 
     const pop = useCallback(() => {
         if (stackRef.current.length <= 1) {
-            setDirection("back");
             setStack([]);
             setCollapsed(false);
             return;
         }
-        setDirection("back");
         setStack(prev => prev.slice(0, -1));
     }, []);
 
     const openRoute = useCallback((route: string, params?: any) => {
         setCollapsed(true);
-        setDirection("forward");
         setStack([createEntry(route, params)]);
     }, []);
 
@@ -89,7 +83,10 @@ export default function HomeBodyCar() {
         [stack, currentParams, canPop, push, pop],
     );
 
-    const ratio = stack.length > 1 ? 0.48 : (contentRatioMap[topRoute ?? ""] ?? 0.42);
+    const ratio =
+        stack.length > 1
+            ? 0.48
+            : (contentRatioMap[topRoute ?? ""] ?? 0.42);
     const contentWidth = Math.min(
         width * 0.52,
         Math.max(rpx(320), width * ratio),
@@ -109,17 +106,17 @@ export default function HomeBodyCar() {
                 ) : null}
 
                 {!fullscreen && stack.length > 0 ? (
-                    <Animated.View
-                        layout={LinearTransition.duration(180)}
-                        style={[styles.content, { width: contentWidth }]}>
-                        <CarContentStack stack={stack} direction={direction} />
-                    </Animated.View>
+                    <View style={[styles.content, { width: contentWidth }]}>
+                        <CarContentStack stack={stack} />
+                    </View>
                 ) : null}
 
                 <View style={styles.player}>
                     <CarPlayer
                         fullscreen={fullscreen}
-                        onToggleFullscreen={() => setFullscreen(value => !value)}
+                        onToggleFullscreen={() =>
+                            setFullscreen(value => !value)
+                        }
                     />
                 </View>
             </View>
@@ -140,8 +137,8 @@ const styles = StyleSheet.create({
     },
     player: {
         flex: 1,
-        paddingLeft: rpx(8),
-        paddingRight: rpx(12),
+        paddingLeft: rpx(16),
+        paddingRight: rpx(16),
         paddingBottom: rpx(12),
     },
 });

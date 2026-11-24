@@ -8,9 +8,7 @@ const maxWindowEdge = Math.max(windowHeight, windowWidth);
 
 /**
  * 全局显示大小（rpx 系数）。
- * 关键：不再按屏幕最短边无限等比放大。车机/平板统一封顶到 0.82，
- * 避免 12 寸车机出现“老人机”大图标；手机仍然按原比例缩小。
- * 用户可在车机设置里 80%~120% 微调，重启后生效。
+ * 在车机设置里调整，重启应用后生效；默认 1.0，不再强制放大。
  */
 function readUiScale() {
     try {
@@ -25,10 +23,9 @@ function readUiScale() {
 }
 
 const uiScale = readUiScale();
-const baseScale = Math.min(minWindowEdge / 750, 0.82);
 
 export default function (rpx: number) {
-    return rpx * baseScale * uiScale;
+    return (rpx / 750) * minWindowEdge * uiScale;
 }
 
 export function vh(pct: number) {

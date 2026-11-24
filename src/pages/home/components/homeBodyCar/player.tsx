@@ -24,11 +24,10 @@ export default function CarPlayer(props: ICarPlayerProps) {
     const { t } = useI18N();
     const pagerRef = useRef<PagerView>(null);
     const [page, setPage] = useState(0);
-    const [coverBox, setCoverBox] = useState({ width: 0, height: 0 });
 
     return (
         <View style={styles.wrapper}>
-            <Background transparent />
+            <Background />
 
             <View style={styles.header}>
                 <View style={styles.headerText}>
@@ -36,24 +35,28 @@ export default function CarPlayer(props: ICarPlayerProps) {
                         color="#fff"
                         fontSize="title"
                         fontWeight="semibold"
-                        numberOfLines={1}
-                        style={styles.textShadow}>
+                        numberOfLines={1}>
                         {musicItem?.title ?? "MusicFree 车机版"}
                     </ThemeText>
                     <ThemeText
-                        color="rgba(255,255,255,0.72)"
+                        color="rgba(255,255,255,0.65)"
                         fontSize="subTitle"
-                        numberOfLines={1}
-                        style={styles.textShadow}>
+                        numberOfLines={1}>
                         {musicItem?.artist ?? ""}
                     </ThemeText>
                 </View>
-                <Icon
-                    name={fullscreen ? "arrow-long-left" : "arrows-left-right"}
-                    size={rpx(40)}
-                    color="#fff"
-                    onPress={onToggleFullscreen}
-                />
+                {musicItem ? (
+                    <Icon
+                        name={
+                            fullscreen
+                                ? "arrow-long-left"
+                                : "arrows-left-right"
+                        }
+                        size={rpx(40)}
+                        color="#fff"
+                        onPress={onToggleFullscreen}
+                    />
+                ) : null}
             </View>
 
             {musicItem ? (
@@ -66,40 +69,9 @@ export default function CarPlayer(props: ICarPlayerProps) {
                             setPage(event.nativeEvent.position)
                         }>
                         <View key="cover" style={styles.page}>
-                            <View
-                                style={styles.coverContainer}
-                                onLayout={event =>
-                                    setCoverBox(prev => {
-                                        const width =
-                                            event.nativeEvent.layout.width;
-                                        const height =
-                                            event.nativeEvent.layout.height;
-                                        return prev.width === width &&
-                                            prev.height === height
-                                            ? prev
-                                            : { width, height };
-                                    })
-                                }>
+                            <View style={styles.coverContainer}>
                                 <FastImage
-                                    style={[
-                                        styles.cover,
-                                        {
-                                            width: Math.max(
-                                                0,
-                                                Math.min(
-                                                    coverBox.width * 0.7,
-                                                    coverBox.height * 0.82,
-                                                ),
-                                            ),
-                                            height: Math.max(
-                                                0,
-                                                Math.min(
-                                                    coverBox.width * 0.7,
-                                                    coverBox.height * 0.82,
-                                                ),
-                                            ),
-                                        },
-                                    ]}
+                                    style={styles.cover}
                                     source={musicItem.artwork}
                                     placeholderSource={ImgAsset.albumDefault}
                                 />
@@ -163,7 +135,7 @@ const styles = StyleSheet.create({
         height: "100%",
         borderRadius: rpx(18),
         overflow: "hidden",
-        backgroundColor: "transparent",
+        backgroundColor: "#101114",
     },
     header: {
         height: rpx(96),
@@ -189,6 +161,8 @@ const styles = StyleSheet.create({
         padding: rpx(24),
     },
     cover: {
+        width: "70%",
+        aspectRatio: 1,
         borderRadius: rpx(18),
     },
     dots: {
@@ -217,12 +191,6 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         marginTop: rpx(24),
-        textShadowColor: "rgba(0,0,0,0.4)",
-        textShadowRadius: rpx(6),
-    },
-    textShadow: {
-        textShadowColor: "rgba(0,0,0,0.45)",
-        textShadowRadius: rpx(6),
     },
     emptyActions: {
         flexDirection: "row",
