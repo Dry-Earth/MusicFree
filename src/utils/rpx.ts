@@ -19,7 +19,7 @@ function readUiScale() {
     } catch {
         // 原生模块未就绪时使用默认值
     }
-    return 1;
+    return 0.8;
 }
 
 const uiScale = readUiScale();

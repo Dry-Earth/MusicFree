@@ -472,7 +472,7 @@
     "carSettings.permissionManagement": "权限管理",
     "carSettings.permissionDescription": "存储、通知、悬浮窗和电池优化",
     "carSettings.resetScale": "恢复默认大小",
-    "carSettings.resetScaleDescription": "显示大小和字体大小恢复为 100%",
+    "carSettings.resetScaleDescription": "显示大小和字体大小恢复为默认 80%",
     "carSettings.bydDetected": "已识别为比亚迪车机",
     "carSettings.otherDevice": "当前设备",
     "dialog.autoStart.title": "开机自启动",

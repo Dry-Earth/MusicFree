@@ -472,7 +472,7 @@
     "carSettings.permissionManagement": "Permission management",
     "carSettings.permissionDescription": "Storage, notifications, overlay and battery optimization",
     "carSettings.resetScale": "Reset display size",
-    "carSettings.resetScaleDescription": "Reset display and font size to 100%",
+    "carSettings.resetScaleDescription": "Reset display and font size to the default 80%",
     "carSettings.bydDetected": "BYD head unit detected",
     "carSettings.otherDevice": "Current device",
     "dialog.autoStart.title": "Start on boot",

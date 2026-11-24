@@ -3,7 +3,13 @@ import { Image, StyleSheet, View } from "react-native";
 import { ImgAsset } from "@/constants/assetsConst";
 import { useCurrentMusic } from "@/core/trackPlayer";
 
-export default function Background() {
+interface IBackgroundProps {
+    /** 车机播放器使用低开销模糊，降低全屏大图的 GPU 压力 */
+    lowCost?: boolean;
+}
+
+export default function Background(props: IBackgroundProps) {
+    const { lowCost } = props;
     const musicItem = useCurrentMusic();
 
     const artworkSource = useMemo(() => {
@@ -23,7 +29,13 @@ export default function Background() {
     return (
         <>
             <View style={style.background} />
-            <Image style={style.blur} blurRadius={50} source={artworkSource} />
+            <Image
+                style={[style.blur, lowCost ? style.blurLowCost : null]}
+                blurRadius={lowCost ? 14 : 50}
+                fadeDuration={0}
+                resizeMode="cover"
+                source={artworkSource}
+            />
         </>
     );
 }
@@ -48,5 +60,8 @@ const style = StyleSheet.create({
         right: 0,
         bottom: 0,
         opacity: 0.5,
+    },
+    blurLowCost: {
+        opacity: 0.32,
     },
 });

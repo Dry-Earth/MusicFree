@@ -115,7 +115,7 @@ async function bootstrapImpl() {
     logger.mark("配置初始化完成");
 
     // 字体缩放（立即生效，不需要重启）
-    setFontScale(Config.getConfig("basic.fontScale") ?? 1);
+    setFontScale(Config.getConfig("basic.fontScale") ?? 0.8);
 
     // 同步开机自启动标记（升级/清数据后自愈）
     NativeUtils?.setAutoStartOnBoot?.(

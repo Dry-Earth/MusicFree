@@ -9,25 +9,54 @@ import Bottom from "@/pages/musicDetail/components/bottom";
 import Lyric from "@/pages/musicDetail/components/content/lyric";
 import { useI18N } from "@/core/i18n";
 import rpx from "@/utils/rpx";
-import React, { useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 import PagerView from "react-native-pager-view";
 
 interface ICarPlayerProps {
     fullscreen: boolean;
     onToggleFullscreen: () => void;
+    onPlayerTap: () => void;
 }
 
 export default function CarPlayer(props: ICarPlayerProps) {
-    const { fullscreen, onToggleFullscreen } = props;
+    const { fullscreen, onToggleFullscreen, onPlayerTap } = props;
     const musicItem = useCurrentMusic();
     const { t } = useI18N();
     const pagerRef = useRef<PagerView>(null);
     const [page, setPage] = useState(0);
+    const lastTapRef = useRef(0);
+    const singleTapTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+    useEffect(() => {
+        return () => {
+            if (singleTapTimerRef.current) {
+                clearTimeout(singleTapTimerRef.current);
+            }
+        };
+    }, []);
+
+    const handlePlayerPress = () => {
+        const now = Date.now();
+        if (now - lastTapRef.current < 280) {
+            if (singleTapTimerRef.current) {
+                clearTimeout(singleTapTimerRef.current);
+                singleTapTimerRef.current = undefined;
+            }
+            lastTapRef.current = 0;
+            onToggleFullscreen();
+            return;
+        }
+        lastTapRef.current = now;
+        singleTapTimerRef.current = setTimeout(() => {
+            lastTapRef.current = 0;
+            onPlayerTap();
+        }, 280);
+    };
 
     return (
-        <View style={styles.wrapper}>
-            <Background />
+        <Pressable style={styles.wrapper} onPress={handlePlayerPress}>
+            <Background lowCost />
 
             <View style={styles.header}>
                 <View style={styles.headerText}>
@@ -45,14 +74,6 @@ export default function CarPlayer(props: ICarPlayerProps) {
                         {musicItem?.artist ?? ""}
                     </ThemeText>
                 </View>
-                <Icon
-                    name={
-                        fullscreen ? "arrow-long-left" : "arrows-left-right"
-                    }
-                    size={rpx(40)}
-                    color="#fff"
-                    onPress={onToggleFullscreen}
-                />
             </View>
 
             {musicItem ? (
@@ -79,7 +100,18 @@ export default function CarPlayer(props: ICarPlayerProps) {
                                 initialPage={0}
                                 onPageSelected={event =>
                                     setPage(event.nativeEvent.position)
-                                }>
+                                }
+                                onPageScroll={event => {
+                                    const { position, offset } =
+                                        event.nativeEvent;
+                                    if (
+                                        position === 1 &&
+                                        offset > 0.15 &&
+                                        page !== 1
+                                    ) {
+                                        setPage(1);
+                                    }
+                                }}>
                                 <View key="cover" style={styles.page}>
                                     <View style={styles.coverContainer}>
                                         <FastImage
@@ -92,11 +124,13 @@ export default function CarPlayer(props: ICarPlayerProps) {
                                     </View>
                                 </View>
                                 <View key="lyric" style={styles.page}>
-                                    <Lyric
-                                        onTurnPageClick={() => {
-                                            pagerRef.current?.setPage(0);
-                                        }}
-                                    />
+                                    {page === 1 ? (
+                                        <Lyric
+                                            onTurnPageClick={() => {
+                                                pagerRef.current?.setPage(0);
+                                            }}
+                                        />
+                                    ) : null}
                                 </View>
                             </PagerView>
 
@@ -116,9 +150,13 @@ export default function CarPlayer(props: ICarPlayerProps) {
                         </>
                     )}
 
-                    <View style={styles.controls}>
+                    <Pressable
+                        style={styles.controls}
+                        onPress={() => {
+                            /* 拦截点击，避免双击播放键触发全屏 */
+                        }}>
                         <Bottom />
-                    </View>
+                    </Pressable>
                 </>
             ) : (
                 <View style={styles.empty}>
@@ -143,7 +181,20 @@ export default function CarPlayer(props: ICarPlayerProps) {
                     </View>
                 </View>
             )}
-        </View>
+
+            <Pressable
+                accessibilityLabel="全屏"
+                onPress={onToggleFullscreen}
+                style={styles.fullscreenButton}>
+                <Icon
+                    name={
+                        fullscreen ? "arrow-long-left" : "arrows-left-right"
+                    }
+                    size={rpx(32)}
+                    color="#fff"
+                />
+            </Pressable>
+        </Pressable>
     );
 }
 
@@ -217,7 +268,20 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
     },
     controls: {
-        paddingHorizontal: rpx(16),
+        paddingLeft: rpx(72),
+        paddingRight: rpx(16),
+    },
+    fullscreenButton: {
+        position: "absolute",
+        left: rpx(20),
+        bottom: rpx(22),
+        width: rpx(48),
+        height: rpx(48),
+        borderRadius: rpx(24),
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "rgba(0,0,0,0.35)",
+        zIndex: 10,
     },
     empty: {
         flex: 1,

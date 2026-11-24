@@ -103,7 +103,7 @@ export default function CarSetting() {
             t("carSettings.displayScale"),
             t("carSettings.displayScaleDescription"),
             displayScales,
-            uiScale ?? 1,
+            uiScale ?? 0.8,
             percentMap(displayScales),
             value => {
                 Config.setConfig("basic.uiScale", value);
@@ -115,7 +115,7 @@ export default function CarSetting() {
             t("carSettings.fontScale"),
             t("carSettings.fontScaleDescription"),
             fontScales,
-            fontScale ?? 1,
+            fontScale ?? 0.8,
             percentMap(fontScales),
             value => {
                 Config.setConfig("basic.fontScale", value);
@@ -157,10 +157,10 @@ export default function CarSetting() {
             title: t("carSettings.resetScale"),
             description: t("carSettings.resetScaleDescription"),
             onPress: () => {
-                Config.setConfig("basic.uiScale", 1);
-                Config.setConfig("basic.fontScale", 1);
-                NativeUtils?.setUiScale?.(1);
-                setFontScale(1);
+                Config.setConfig("basic.uiScale", 0.8);
+                Config.setConfig("basic.fontScale", 0.8);
+                NativeUtils?.setUiScale?.(0.8);
+                setFontScale(0.8);
                 Toast.success(t("carSettings.restartHint"));
             },
         },

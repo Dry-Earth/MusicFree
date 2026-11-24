@@ -72,6 +72,13 @@ export default function HomeBodyCar() {
         setCollapsed(false);
     }, []);
 
+    const handlePlayerTap = useCallback(() => {
+        if (!collapsed || moreOpen) {
+            setMoreOpen(false);
+            setCollapsed(true);
+        }
+    }, [collapsed, moreOpen]);
+
     const canPop = stack.length > 0;
     const currentParams = stack[stack.length - 1]?.params;
     const topRoute = stack[stack.length - 1]?.route;
@@ -141,6 +148,7 @@ export default function HomeBodyCar() {
                         onToggleFullscreen={() =>
                             setFullscreen(value => !value)
                         }
+                        onPlayerTap={handlePlayerTap}
                     />
                 </View>
             </View>

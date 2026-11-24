@@ -24,9 +24,13 @@ Typical release assets:
 - Car home: text+icon menu on the left, fixed player filling the full height on the right
 - Selecting a menu item collapses the left column to icons only and shows the page in the middle pane (no slide animation)
 - Middle width adapts per page; the player shrinks but stays visible
-- Fullscreen toggle for the player; no full-width search bar above the player (search entry lives in the left menu)
+- Fullscreen player: cover on the left, lyrics on the right; button at bottom-left
+- Single tap collapses the left menu; double tap toggles fullscreen
+- No full-width search bar above the player (search entry lives in the left menu)
 - Swipe between cover and lyrics
-- Display size 60%~150% (restart), font size 70%~150% (immediate)
+- Display size 60%~150% (default 80%, restart), font size 70%~150% (default 80%, immediate)
+- Status bar hidden on the car home (fullscreen)
+- "More" menu expands inside the left column instead of covering the player
 - Car mode: landscape layout and media controls, auto-enlargement can be disabled
 - Legacy storage mode (`targetSdk 29 + requestLegacyExternalStorage`) for DiLink units that cannot grant "All files access"
 - Notification permission, foreground playback service, battery optimization whitelist
