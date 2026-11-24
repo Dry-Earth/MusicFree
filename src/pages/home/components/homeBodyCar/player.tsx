@@ -57,42 +57,64 @@ export default function CarPlayer(props: ICarPlayerProps) {
 
             {musicItem ? (
                 <>
-                    <PagerView
-                        ref={pagerRef}
-                        style={styles.pager}
-                        initialPage={0}
-                        onPageSelected={event =>
-                            setPage(event.nativeEvent.position)
-                        }>
-                        <View key="cover" style={styles.page}>
-                            <View style={styles.coverContainer}>
+                    {fullscreen ? (
+                        <View style={styles.split}>
+                            <View style={styles.splitCover}>
                                 <FastImage
-                                    style={styles.cover}
+                                    style={styles.splitArtwork}
+                                    resizeMode="contain"
                                     source={musicItem.artwork}
                                     placeholderSource={ImgAsset.albumDefault}
                                 />
                             </View>
+                            <View style={styles.splitLyric}>
+                                <Lyric />
+                            </View>
                         </View>
-                        <View key="lyric" style={styles.page}>
-                            <Lyric
-                                onTurnPageClick={() => {
-                                    pagerRef.current?.setPage(0);
-                                }}
-                            />
-                        </View>
-                    </PagerView>
+                    ) : (
+                        <>
+                            <PagerView
+                                ref={pagerRef}
+                                style={styles.pager}
+                                initialPage={0}
+                                onPageSelected={event =>
+                                    setPage(event.nativeEvent.position)
+                                }>
+                                <View key="cover" style={styles.page}>
+                                    <View style={styles.coverContainer}>
+                                        <FastImage
+                                            style={styles.cover}
+                                            source={musicItem.artwork}
+                                            placeholderSource={
+                                                ImgAsset.albumDefault
+                                            }
+                                        />
+                                    </View>
+                                </View>
+                                <View key="lyric" style={styles.page}>
+                                    <Lyric
+                                        onTurnPageClick={() => {
+                                            pagerRef.current?.setPage(0);
+                                        }}
+                                    />
+                                </View>
+                            </PagerView>
 
-                    <View style={styles.dots}>
-                        {[0, 1].map(index => (
-                            <View
-                                key={index}
-                                style={[
-                                    styles.dot,
-                                    page === index ? styles.dotActive : null,
-                                ]}
-                            />
-                        ))}
-                    </View>
+                            <View style={styles.dots}>
+                                {[0, 1].map(index => (
+                                    <View
+                                        key={index}
+                                        style={[
+                                            styles.dot,
+                                            page === index
+                                                ? styles.dotActive
+                                                : null,
+                                        ]}
+                                    />
+                                ))}
+                            </View>
+                        </>
+                    )}
 
                     <View style={styles.controls}>
                         <Bottom />
@@ -143,6 +165,23 @@ const styles = StyleSheet.create({
     headerText: {
         flex: 1,
         marginRight: rpx(24),
+    },
+    split: {
+        flex: 1,
+        flexDirection: "row",
+    },
+    splitCover: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        padding: rpx(24),
+    },
+    splitArtwork: {
+        width: "100%",
+        height: "100%",
+    },
+    splitLyric: {
+        flex: 1,
     },
     pager: {
         flex: 1,

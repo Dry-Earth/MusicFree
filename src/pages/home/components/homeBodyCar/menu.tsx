@@ -1,11 +1,11 @@
 import Icon, { IIconName } from "@/components/base/icon.tsx";
 import ListItem from "@/components/base/listItem";
 import ThemeText from "@/components/base/themeText";
+import { showDialog } from "@/components/dialogs/useDialog";
 import { useI18N } from "@/core/i18n";
 import { ROUTE_PATH } from "@/core/router";
 import useColors from "@/hooks/useColors";
 import rpx from "@/utils/rpx";
-import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
@@ -20,17 +20,28 @@ interface IMenuItem {
 
 interface ICarMenuProps {
     collapsed: boolean;
+    moreOpen: boolean;
     activeRoute?: string;
     canPop: boolean;
     onBack: () => void;
-    onSelect: (route: string, params?: any) => void;
+    onOpenMore: () => void;
+    onCloseMore: () => void;
+    onSelect: (route: string, params?: any, keepExpanded?: boolean) => void;
 }
 
 export default function CarMenu(props: ICarMenuProps) {
-    const { collapsed, activeRoute, canPop, onBack, onSelect } = props;
-    const navigation = useNavigation<any>();
+    const {
+        collapsed,
+        moreOpen,
+        activeRoute,
+        canPop,
+        onBack,
+        onOpenMore,
+        onCloseMore,
+        onSelect,
+    } = props;
     const colors = useColors();
-    const { t } = useI18N();
+    const { t, getLanguage, getSupportedLanguages, setLanguage } = useI18N();
 
     const musicMenu: IMenuItem[] = [
         {
@@ -89,17 +100,80 @@ export default function CarMenu(props: ICarMenuProps) {
             key: "more",
             icon: "bars-3",
             title: t("home.openSidebar.a11y"),
-            onPress: () => navigation.openDrawer(),
+            onPress: onOpenMore,
         },
     ];
 
-    const handleItem = (item: IMenuItem) => {
+    const moreMenu: IMenuItem[] = [
+        {
+            key: "basic-setting",
+            icon: "cog-8-tooth",
+            title: t("sidebar.basicSettings"),
+            route: ROUTE_PATH.SETTING,
+            params: { type: "basic" },
+        },
+        {
+            key: "plugin-setting",
+            icon: "javascript",
+            title: t("sidebar.pluginManagement"),
+            route: ROUTE_PATH.SETTING,
+            params: { type: "plugin" },
+        },
+        {
+            key: "theme-setting",
+            icon: "t-shirt-outline",
+            title: t("sidebar.themeSettings"),
+            route: ROUTE_PATH.SETTING,
+            params: { type: "theme" },
+        },
+        {
+            key: "permission-setting",
+            icon: "shield-keyhole-outline",
+            title: t("sidebar.permissionManagement"),
+            route: ROUTE_PATH.PERMISSIONS,
+        },
+        {
+            key: "backup-setting",
+            icon: "circle-stack",
+            title: t("sidebar.backupAndResume"),
+            route: ROUTE_PATH.SETTING,
+            params: { type: "backup" },
+        },
+        {
+            key: "language-setting",
+            icon: "language",
+            title: t("sidebar.languageSettings"),
+            onPress: () => {
+                showDialog("RadioDialog", {
+                    content: getSupportedLanguages().map(item => ({
+                        title: item.name,
+                        value: item.locale,
+                        label: item.name,
+                    })),
+                    title: t("sidebar.languageSettings"),
+                    onOk(value) {
+                        setLanguage(value as string);
+                    },
+                    defaultSelected: getLanguage().locale,
+                });
+            },
+        },
+        {
+            key: "about-setting",
+            icon: "information-circle",
+            title: t("common.about"),
+            route: ROUTE_PATH.SETTING,
+            params: { type: "about" },
+        },
+    ];
+
+    const handleItem = (item: IMenuItem, keepExpanded = false) => {
         if (item.onPress) {
             item.onPress();
             return;
         }
         if (item.route) {
-            onSelect(item.route, item.params);
+            onSelect(item.route, item.params, keepExpanded);
         }
     };
 
@@ -113,14 +187,14 @@ export default function CarMenu(props: ICarMenuProps) {
         return activeRoute === item.key;
     };
 
-    const renderExpanded = (item: IMenuItem) => {
+    const renderExpanded = (item: IMenuItem, keepExpanded = false) => {
         const active = isActive(item);
         return (
             <ListItem
                 key={item.key}
                 withHorizontalPadding
                 heightType="smallest"
-                onPress={() => handleItem(item)}>
+                onPress={() => handleItem(item, keepExpanded)}>
                 <ListItem.ListItemIcon
                     icon={item.icon}
                     width={rpx(44)}
@@ -163,7 +237,11 @@ export default function CarMenu(props: ICarMenuProps) {
         );
     };
 
-    const renderGroup = (title: string, items: IMenuItem[]) => (
+    const renderGroup = (
+        title: string,
+        items: IMenuItem[],
+        keepExpanded = false,
+    ) => (
         <View style={styles.group}>
             {!collapsed ? (
                 <ThemeText
@@ -173,9 +251,36 @@ export default function CarMenu(props: ICarMenuProps) {
                     {title}
                 </ThemeText>
             ) : null}
-            {items.map(collapsed ? renderCollapsed : renderExpanded)}
+            {items.map(item =>
+                collapsed
+                    ? renderCollapsed(item)
+                    : renderExpanded(item, keepExpanded),
+            )}
         </View>
     );
+
+    if (moreOpen) {
+        return (
+            <ScrollView
+                style={[styles.wrapper, styles.wrapperExpanded]}
+                showsVerticalScrollIndicator={false}>
+                <Pressable
+                    accessibilityLabel={t("common.back")}
+                    onPress={onCloseMore}
+                    style={styles.subMenuBack}>
+                    <Icon
+                        name="arrow-long-left"
+                        size={rpx(36)}
+                        color={colors.text}
+                    />
+                    <ThemeText style={styles.subMenuBackText}>
+                        {t("common.back")}
+                    </ThemeText>
+                </Pressable>
+                {moreMenu.map(item => renderExpanded(item, true))}
+            </ScrollView>
+        );
+    }
 
     return (
         <ScrollView
@@ -209,6 +314,9 @@ const styles = StyleSheet.create({
     wrapperCollapsed: {
         width: rpx(80),
     },
+    wrapperExpanded: {
+        width: rpx(300),
+    },
     group: {
         marginTop: rpx(24),
     },
@@ -221,6 +329,15 @@ const styles = StyleSheet.create({
         height: rpx(68),
         alignItems: "center",
         justifyContent: "center",
+    },
+    subMenuBack: {
+        flexDirection: "row",
+        alignItems: "center",
+        height: rpx(68),
+        paddingHorizontal: rpx(24),
+    },
+    subMenuBackText: {
+        marginLeft: rpx(12),
     },
     activeBar: {
         position: "absolute",

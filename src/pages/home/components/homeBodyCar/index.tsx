@@ -32,6 +32,7 @@ const contentRatioMap: Record<string, number> = {
 export default function HomeBodyCar() {
     const { width } = useWindowDimensions();
     const [collapsed, setCollapsed] = useState(false);
+    const [moreOpen, setMoreOpen] = useState(false);
     const [fullscreen, setFullscreen] = useState(false);
     const [stack, setStack] = useState<CarStackEntry[]>([]);
     const stackRef = useRef(stack);
@@ -50,9 +51,25 @@ export default function HomeBodyCar() {
         setStack(prev => prev.slice(0, -1));
     }, []);
 
-    const openRoute = useCallback((route: string, params?: any) => {
-        setCollapsed(true);
-        setStack([createEntry(route, params)]);
+    const openRoute = useCallback(
+        (route: string, params?: any, keepExpanded = false) => {
+            if (!keepExpanded) {
+                setMoreOpen(false);
+            }
+            setCollapsed(!keepExpanded);
+            setStack([createEntry(route, params)]);
+        },
+        [],
+    );
+
+    const openMore = useCallback(() => {
+        setMoreOpen(true);
+        setCollapsed(false);
+    }, []);
+
+    const closeMore = useCallback(() => {
+        setMoreOpen(false);
+        setCollapsed(false);
     }, []);
 
     const canPop = stack.length > 0;
@@ -69,8 +86,12 @@ export default function HomeBodyCar() {
             pop();
             return true;
         }
+        if (moreOpen) {
+            closeMore();
+            return true;
+        }
         return false;
-    }, [fullscreen, pop]);
+    }, [fullscreen, pop, moreOpen, closeMore]);
 
     const navValue = useMemo(
         () => ({
@@ -98,9 +119,12 @@ export default function HomeBodyCar() {
                 {!fullscreen ? (
                     <CarMenu
                         collapsed={collapsed}
+                        moreOpen={moreOpen}
                         activeRoute={activeRoute}
                         canPop={canPop}
                         onBack={pop}
+                        onOpenMore={openMore}
+                        onCloseMore={closeMore}
                         onSelect={openRoute}
                     />
                 ) : null}

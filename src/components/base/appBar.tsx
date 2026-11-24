@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import rpx from "@/utils/rpx";
 import useColors from "@/hooks/useColors";
+import { useFontScale } from "@/core/uiScale";
 import StatusBar from "./statusBar";
 import color from "color";
 import IconButton from "./iconButton";
@@ -73,9 +74,12 @@ export default function AppBar(props: IAppBarProps) {
 
     const colors = useColors();
     const goBack = useGoBack();
+    const fontScale = useFontScale();
 
     const bgColor = color(colors.appBar ?? colors.primary).toString();
     const contentColor = _color ?? colors.appBarText;
+    // 标题栏高度随字体大小自适应，避免字小、栏高浪费空间
+    const barHeight = Math.max(rpx(56), rpx(76) * fontScale);
 
     const [showMenu, setShowMenu] = useState(false);
     const [menuIconLayout, setMenuIconLayout] =
@@ -102,6 +106,7 @@ export default function AppBar(props: IAppBarProps) {
             <View
                 style={[
                     styles.container,
+                    { height: barHeight },
                     containerStyle,
                     { backgroundColor: bgColor },
                 ]}>
@@ -239,7 +244,6 @@ const styles = StyleSheet.create({
     container: {
         width: "100%",
         zIndex: 10000,
-        height: rpx(88),
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: rpx(24),

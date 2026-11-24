@@ -1,5 +1,9 @@
 import React, { useEffect } from "react";
-import { Dimensions, StyleSheet } from "react-native";
+import {
+    Dimensions,
+    StatusBar as RNStatusBar,
+    StyleSheet,
+} from "react-native";
 
 import NavBar from "./components/navBar";
 import MusicBar from "@/components/musicBar";
@@ -37,9 +41,22 @@ function Home() {
         };
     }, [carMode, keepScreenOn]);
 
+    // 车机主页自动全屏，隐藏状态栏
+    useEffect(() => {
+        if (!useCarHome) {
+            return;
+        }
+        RNStatusBar.setHidden(true, "fade");
+        return () => {
+            RNStatusBar.setHidden(false, "fade");
+        };
+    }, [useCarHome]);
+
     return (
-        <SafeAreaView edges={["top", "bottom"]} style={styles.appWrapper}>
-            <HomeStatusBar />
+        <SafeAreaView
+            edges={useCarHome ? ["bottom"] : ["top", "bottom"]}
+            style={styles.appWrapper}>
+            {useCarHome ? null : <HomeStatusBar />}
             <HorizontalSafeAreaView style={globalStyle.flex1}>
                 <>
                     {useCarHome ? null : <NavBar />}

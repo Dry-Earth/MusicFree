@@ -7,9 +7,11 @@ interface IFastImageProps {
     defaultSource?: FastImageProps["defaultSource"];
     placeholderSource?: ImageRequireSource;
     source?: FastImageProps["source"] | string;
+    resizeMode?: FastImageProps["resizeMode"];
 }
 export default function (props: IFastImageProps) {
-    const { style, placeholderSource, defaultSource, source } = props ?? {};
+    const { style, placeholderSource, defaultSource, source, resizeMode } =
+        props ?? {};
     const [isError, setIsError] = useState(false);
 
 
@@ -34,6 +36,7 @@ export default function (props: IFastImageProps) {
     return (
         <FastImage
             style={style}
+            resizeMode={resizeMode}
             source={isError ? placeholderSource : realSource}
             onError={() => {
                 setIsError(true);
