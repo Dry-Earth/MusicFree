@@ -9,9 +9,10 @@ import Bottom from "@/pages/musicDetail/components/bottom";
 import Lyric from "@/pages/musicDetail/components/content/lyric";
 import { useI18N } from "@/core/i18n";
 import rpx from "@/utils/rpx";
-import React, { useEffect, useRef, useState } from "react";
+import React, { memo, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import PagerView from "react-native-pager-view";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 interface ICarPlayerProps {
     fullscreen: boolean;
@@ -19,43 +20,37 @@ interface ICarPlayerProps {
     onPlayerTap: () => void;
 }
 
-export default function CarPlayer(props: ICarPlayerProps) {
+function CarPlayer(props: ICarPlayerProps) {
     const { fullscreen, onToggleFullscreen, onPlayerTap } = props;
     const musicItem = useCurrentMusic();
     const { t } = useI18N();
     const pagerRef = useRef<PagerView>(null);
     const [page, setPage] = useState(0);
-    const lastTapRef = useRef(0);
-    const singleTapTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
-    useEffect(() => {
-        return () => {
-            if (singleTapTimerRef.current) {
-                clearTimeout(singleTapTimerRef.current);
+    const doubleTapGesture = Gesture.Tap()
+        .numberOfTaps(2)
+        .maxDelay(280)
+        .onEnd((_event, success) => {
+            if (success) {
+                onToggleFullscreen();
             }
-        };
-    }, []);
+        })
+        .runOnJS(true);
 
-    const handlePlayerPress = () => {
-        const now = Date.now();
-        if (now - lastTapRef.current < 280) {
-            if (singleTapTimerRef.current) {
-                clearTimeout(singleTapTimerRef.current);
-                singleTapTimerRef.current = undefined;
-            }
-            lastTapRef.current = 0;
-            onToggleFullscreen();
-            return;
-        }
-        lastTapRef.current = now;
-        singleTapTimerRef.current = setTimeout(() => {
-            lastTapRef.current = 0;
+    const singleTapGesture = Gesture.Tap()
+        .numberOfTaps(1)
+        .onEnd(() => {
             onPlayerTap();
-        }, 280);
-    };
+        })
+        .runOnJS(true);
+
+    const tapGesture = Gesture.Exclusive(
+        doubleTapGesture,
+        singleTapGesture,
+    );
 
     return (
-        <Pressable style={styles.wrapper} onPress={handlePlayerPress}>
+        <View style={styles.wrapper}>
             <Background lowCost />
 
             <View style={styles.header}>
@@ -78,85 +73,85 @@ export default function CarPlayer(props: ICarPlayerProps) {
 
             {musicItem ? (
                 <>
-                    {fullscreen ? (
-                        <View style={styles.split}>
-                            <View style={styles.splitCover}>
-                                <FastImage
-                                    style={styles.splitArtwork}
-                                    resizeMode="contain"
-                                    source={musicItem.artwork}
-                                    placeholderSource={ImgAsset.albumDefault}
-                                />
-                            </View>
-                            <View style={styles.splitLyric}>
-                                <Lyric />
-                            </View>
-                        </View>
-                    ) : (
-                        <>
-                            <PagerView
-                                ref={pagerRef}
-                                style={styles.pager}
-                                initialPage={0}
-                                onPageSelected={event =>
-                                    setPage(event.nativeEvent.position)
-                                }
-                                onPageScroll={event => {
-                                    const { position, offset } =
-                                        event.nativeEvent;
-                                    if (
-                                        position === 1 &&
-                                        offset > 0.15 &&
-                                        page !== 1
-                                    ) {
-                                        setPage(1);
-                                    }
-                                }}>
-                                <View key="cover" style={styles.page}>
-                                    <View style={styles.coverContainer}>
+                    <GestureDetector gesture={tapGesture}>
+                        <View style={styles.tapArea}>
+                            {fullscreen ? (
+                                <View style={styles.split}>
+                                    <View style={styles.splitCover}>
                                         <FastImage
-                                            style={styles.cover}
+                                            style={styles.splitArtwork}
+                                            resizeMode="contain"
                                             source={musicItem.artwork}
-                                            placeholderSource={
-                                                ImgAsset.albumDefault
-                                            }
+                                            placeholderSource={ImgAsset.albumDefault}
                                         />
                                     </View>
+                                    <View style={styles.splitLyric}>
+                                        <Lyric />
+                                    </View>
                                 </View>
-                                <View key="lyric" style={styles.page}>
-                                    {page === 1 ? (
-                                        <Lyric
-                                            onTurnPageClick={() => {
-                                                pagerRef.current?.setPage(0);
-                                            }}
-                                        />
-                                    ) : null}
-                                </View>
-                            </PagerView>
+                            ) : (
+                                <>
+                                    <PagerView
+                                        ref={pagerRef}
+                                        style={styles.pager}
+                                        initialPage={0}
+                                        onPageSelected={event =>
+                                            setPage(event.nativeEvent.position)
+                                        }
+                                        onPageScroll={event => {
+                                            const { position, offset } =
+                                        event.nativeEvent;
+                                            if (
+                                                position === 1 &&
+                                        offset > 0.15 &&
+                                        page !== 1
+                                            ) {
+                                                setPage(1);
+                                            }
+                                        }}>
+                                        <View key="cover" style={styles.page}>
+                                            <View style={styles.coverContainer}>
+                                                <FastImage
+                                                    style={styles.cover}
+                                                    source={musicItem.artwork}
+                                                    placeholderSource={
+                                                        ImgAsset.albumDefault
+                                                    }
+                                                />
+                                            </View>
+                                        </View>
+                                        <View key="lyric" style={styles.page}>
+                                            {page === 1 ? (
+                                                <Lyric
+                                                    onTurnPageClick={() => {
+                                                        pagerRef.current?.setPage(0);
+                                                    }}
+                                                />
+                                            ) : null}
+                                        </View>
+                                    </PagerView>
 
-                            <View style={styles.dots}>
-                                {[0, 1].map(index => (
-                                    <View
-                                        key={index}
-                                        style={[
-                                            styles.dot,
-                                            page === index
-                                                ? styles.dotActive
-                                                : null,
-                                        ]}
-                                    />
-                                ))}
-                            </View>
-                        </>
-                    )}
+                                    <View style={styles.dots}>
+                                        {[0, 1].map(index => (
+                                            <View
+                                                key={index}
+                                                style={[
+                                                    styles.dot,
+                                                    page === index
+                                                        ? styles.dotActive
+                                                        : null,
+                                                ]}
+                                            />
+                                        ))}
+                                    </View>
+                                </>
+                            )}
+                        </View>
+                    </GestureDetector>
 
-                    <Pressable
-                        style={styles.controls}
-                        onPress={() => {
-                            /* 拦截点击，避免双击播放键触发全屏 */
-                        }}>
+                    <View style={styles.controls}>
                         <Bottom />
-                    </Pressable>
+                    </View>
                 </>
             ) : (
                 <View style={styles.empty}>
@@ -194,9 +189,11 @@ export default function CarPlayer(props: ICarPlayerProps) {
                     color="#fff"
                 />
             </Pressable>
-        </Pressable>
+        </View>
     );
 }
+
+export default memo(CarPlayer);
 
 const styles = StyleSheet.create({
     wrapper: {
@@ -216,6 +213,9 @@ const styles = StyleSheet.create({
     headerText: {
         flex: 1,
         marginRight: rpx(24),
+    },
+    tapArea: {
+        flex: 1,
     },
     split: {
         flex: 1,

@@ -2,7 +2,13 @@ import { CarNavContext, type CarStackEntry } from "@/core/router/carNavContext";
 import { ROUTE_PATH } from "@/core/router";
 import useHardwareBack from "@/hooks/useHardwareBack";
 import rpx from "@/utils/rpx";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+    startTransition,
+    useCallback,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import CarMenu from "./menu";
 import CarContentStack from "./stack";
@@ -39,7 +45,9 @@ export default function HomeBodyCar() {
     stackRef.current = stack;
 
     const push = useCallback((route: string, params?: any) => {
-        setStack(prev => [...prev, createEntry(route, params)]);
+        startTransition(() => {
+            setStack(prev => [...prev, createEntry(route, params)]);
+        });
     }, []);
 
     const pop = useCallback(() => {
@@ -57,7 +65,9 @@ export default function HomeBodyCar() {
                 setMoreOpen(false);
             }
             setCollapsed(!keepExpanded);
-            setStack([createEntry(route, params)]);
+            startTransition(() => {
+                setStack([createEntry(route, params)]);
+            });
         },
         [],
     );
@@ -78,6 +88,10 @@ export default function HomeBodyCar() {
             setCollapsed(true);
         }
     }, [collapsed, moreOpen]);
+
+    const toggleFullscreen = useCallback(() => {
+        setFullscreen(value => !value);
+    }, []);
 
     const canPop = stack.length > 0;
     const currentParams = stack[stack.length - 1]?.params;
@@ -145,9 +159,7 @@ export default function HomeBodyCar() {
                 <View style={styles.player}>
                     <CarPlayer
                         fullscreen={fullscreen}
-                        onToggleFullscreen={() =>
-                            setFullscreen(value => !value)
-                        }
+                        onToggleFullscreen={toggleFullscreen}
                         onPlayerTap={handlePlayerTap}
                     />
                 </View>

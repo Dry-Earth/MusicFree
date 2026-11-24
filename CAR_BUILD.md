@@ -102,7 +102,7 @@ adb shell am broadcast -a fun.upup.musicfree.custom.CONTROL --es action pause
   - `RELEASE_KEY_ALIAS`
   - `RELEASE_KEY_PASSWORD`
 - keystore 备份位置：`~/Documents/Default Project/musicfree-car-signing/`（不要提交到仓库！）。密码在同目录 `credentials.txt`，请自行备份到安全位置。
-- `versionCode` 提升到 `400018`。
+- `versionCode` 提升到 `400019`。
 - 从 debug 签名切换到正式签名后，车机上必须先卸载旧 debug 版再安装，否则会提示签名不一致。
 
 ## 二、构建 APK
