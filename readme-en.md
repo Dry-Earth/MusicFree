@@ -20,10 +20,14 @@ Typical release assets:
 ## Car adaptations
 
 - Auto-detects BYD / DiLink / automotive UI / large landscape screens
-- Car home: music/settings menu on the left, fixed player on the right; swipe between cover and lyrics
-- Adjustable display size (80%~120%, restart required) and font size (85%~120%, immediate)
-- Car mode: landscape two-column layout and media controls, auto-enlargement can be disabled
-- Limited drawer width for 1920px-wide head units
+- Based on the 400014 stable build, keeping its fixed player and display/font settings
+- Car home: text+icon menu on the left, fixed player filling the full height on the right
+- Selecting a menu item collapses the left column to icons only and shows the page in the middle pane (no slide animation)
+- Middle width adapts per page; the player shrinks but stays visible
+- Fullscreen toggle for the player; no full-width search bar above the player (search entry lives in the left menu)
+- Swipe between cover and lyrics
+- Display size 60%~150% (restart), font size 70%~150% (immediate)
+- Car mode: landscape layout and media controls, auto-enlargement can be disabled
 - Legacy storage mode (`targetSdk 29 + requestLegacyExternalStorage`) for DiLink units that cannot grant "All files access"
 - Notification permission, foreground playback service, battery optimization whitelist
 - Optional start on boot, with a first-run prompt in car mode

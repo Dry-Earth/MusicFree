@@ -2,7 +2,6 @@ import FastImage from "@/components/base/fastImage";
 import Icon from "@/components/base/icon.tsx";
 import ThemeText from "@/components/base/themeText";
 import { ImgAsset } from "@/constants/assetsConst";
-import { ROUTE_PATH, useNavigate } from "@/core/router";
 import { useCurrentMusic } from "@/core/trackPlayer";
 import { showPanel } from "@/components/panels/usePanel";
 import Background from "@/pages/musicDetail/components/background";
@@ -14,9 +13,14 @@ import React, { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import PagerView from "react-native-pager-view";
 
-export default function CarPlayer() {
+interface ICarPlayerProps {
+    fullscreen: boolean;
+    onToggleFullscreen: () => void;
+}
+
+export default function CarPlayer(props: ICarPlayerProps) {
+    const { fullscreen, onToggleFullscreen } = props;
     const musicItem = useCurrentMusic();
-    const navigate = useNavigate();
     const { t } = useI18N();
     const pagerRef = useRef<PagerView>(null);
     const [page, setPage] = useState(0);
@@ -43,10 +47,14 @@ export default function CarPlayer() {
                 </View>
                 {musicItem ? (
                     <Icon
-                        name="arrows-left-right"
+                        name={
+                            fullscreen
+                                ? "arrow-long-left"
+                                : "arrows-left-right"
+                        }
                         size={rpx(40)}
                         color="#fff"
-                        onPress={() => navigate(ROUTE_PATH.MUSIC_DETAIL)}
+                        onPress={onToggleFullscreen}
                     />
                 ) : null}
             </View>

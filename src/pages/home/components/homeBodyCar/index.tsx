@@ -1,17 +1,126 @@
+import { CarNavContext, type CarStackEntry } from "@/core/router/carNavContext";
+import { ROUTE_PATH } from "@/core/router";
+import useHardwareBack from "@/hooks/useHardwareBack";
 import rpx from "@/utils/rpx";
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { StyleSheet, useWindowDimensions, View } from "react-native";
 import CarMenu from "./menu";
+import CarContentStack from "./stack";
 import CarPlayer from "./player";
 
+let entrySeed = 0;
+function createEntry(route: string, params?: any): CarStackEntry {
+    entrySeed += 1;
+    return {
+        key: `${route}-${entrySeed}`,
+        route,
+        params,
+    };
+}
+
+const contentRatioMap: Record<string, number> = {
+    [ROUTE_PATH.SEARCH_PAGE]: 0.46,
+    [ROUTE_PATH.LOCAL]: 0.44,
+    [ROUTE_PATH.MY_SHEETS]: 0.46,
+    [ROUTE_PATH.SETTING]: 0.4,
+    [ROUTE_PATH.PERMISSIONS]: 0.4,
+    [ROUTE_PATH.HISTORY]: 0.42,
+    [ROUTE_PATH.RECOMMEND_SHEETS]: 0.44,
+    [ROUTE_PATH.TOP_LIST]: 0.42,
+};
+
 export default function HomeBodyCar() {
+    const { width } = useWindowDimensions();
+    const [collapsed, setCollapsed] = useState(false);
+    const [fullscreen, setFullscreen] = useState(false);
+    const [stack, setStack] = useState<CarStackEntry[]>([]);
+    const stackRef = useRef(stack);
+    stackRef.current = stack;
+
+    const push = useCallback((route: string, params?: any) => {
+        setStack(prev => [...prev, createEntry(route, params)]);
+    }, []);
+
+    const pop = useCallback(() => {
+        if (stackRef.current.length <= 1) {
+            setStack([]);
+            setCollapsed(false);
+            return;
+        }
+        setStack(prev => prev.slice(0, -1));
+    }, []);
+
+    const openRoute = useCallback((route: string, params?: any) => {
+        setCollapsed(true);
+        setStack([createEntry(route, params)]);
+    }, []);
+
+    const canPop = stack.length > 0;
+    const currentParams = stack[stack.length - 1]?.params;
+    const topRoute = stack[stack.length - 1]?.route;
+    const activeRoute = stack[0]?.route;
+
+    useHardwareBack(() => {
+        if (fullscreen) {
+            setFullscreen(false);
+            return true;
+        }
+        if (stackRef.current.length > 0) {
+            pop();
+            return true;
+        }
+        return false;
+    }, [fullscreen, pop]);
+
+    const navValue = useMemo(
+        () => ({
+            stack,
+            currentParams,
+            canPop,
+            push,
+            pop,
+        }),
+        [stack, currentParams, canPop, push, pop],
+    );
+
+    const ratio =
+        stack.length > 1
+            ? 0.48
+            : (contentRatioMap[topRoute ?? ""] ?? 0.42);
+    const contentWidth = Math.min(
+        width * 0.52,
+        Math.max(rpx(320), width * ratio),
+    );
+
     return (
-        <View style={styles.wrapper}>
-            <CarMenu />
-            <View style={styles.player}>
-                <CarPlayer />
+        <CarNavContext.Provider value={navValue}>
+            <View style={styles.wrapper}>
+                {!fullscreen ? (
+                    <CarMenu
+                        collapsed={collapsed}
+                        activeRoute={activeRoute}
+                        canPop={canPop}
+                        onBack={pop}
+                        onSelect={openRoute}
+                    />
+                ) : null}
+
+                {!fullscreen && stack.length > 0 ? (
+                    <View style={[styles.content, { width: contentWidth }]}>
+                        <CarContentStack stack={stack} />
+                    </View>
+                ) : null}
+
+                <View style={styles.player}>
+                    <CarPlayer
+                        fullscreen={fullscreen}
+                        onToggleFullscreen={() =>
+                            setFullscreen(value => !value)
+                        }
+                    />
+                </View>
             </View>
-        </View>
+        </CarNavContext.Provider>
     );
 }
 
@@ -20,6 +129,11 @@ const styles = StyleSheet.create({
         width: "100%",
         flex: 1,
         flexDirection: "row",
+    },
+    content: {
+        flexGrow: 0,
+        flexShrink: 0,
+        height: "100%",
     },
     player: {
         flex: 1,

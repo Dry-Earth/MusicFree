@@ -4,10 +4,12 @@ import SortableFlatList from "@/components/base/SortableFlatList";
 import ThemeText from "@/components/base/themeText";
 import globalStyle from "@/constants/globalStyle";
 import { useI18N } from "@/core/i18n";
+import { useGoBack } from "@/core/router";
 import PluginManager, { Plugin, useSortedPlugins } from "@/core/pluginManager";
 import useColors from "@/hooks/useColors";
 import rpx from "@/utils/rpx";
 import Toast from "@/utils/toast";
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -15,6 +17,8 @@ const ITEM_HEIGHT = rpx(96);
 const marginTop = rpx(188) + (StatusBar.currentHeight ?? 0);
 
 export default function PluginSort() {
+    const navigation = useNavigation<any>();
+    const carGoBack = useGoBack();
     const plugins = useSortedPlugins();
     const [sortingPlugins, setSortingPlugins] = useState([...plugins]);
 
@@ -30,7 +34,12 @@ export default function PluginSort() {
     }
     return (
         <>
-            <AppBar>{t("pluginSetting.menu.sort")}</AppBar>
+            <AppBar
+                onBackPress={() =>
+                    navigation.canGoBack() ? navigation.goBack() : carGoBack()
+                }>
+                {t("pluginSetting.menu.sort")}
+            </AppBar>
             <HorizontalSafeAreaView style={style.sortWrapper}>
                 <>
                     <ThemeText fontWeight="bold">{t("pluginSetting.menu.sort")}</ThemeText>

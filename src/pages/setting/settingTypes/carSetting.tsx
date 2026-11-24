@@ -83,8 +83,8 @@ export default function CarSetting() {
             return acc;
         }, {});
 
-    const displayScales = [0.8, 0.9, 1, 1.1, 1.2];
-    const fontScales = [0.85, 0.9, 1, 1.1, 1.2];
+    const displayScales = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5];
+    const fontScales = [0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5];
 
     const displaySection: ISettingRow[] = [
         createRadio(

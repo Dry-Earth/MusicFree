@@ -12,6 +12,7 @@ import { musicIsPaused } from "@/utils/trackUtils";
 import MusicInfo from "./musicInfo";
 import Icon from "@/components/base/icon.tsx";
 import useCarMode from "@/hooks/useCarMode";
+import { useCarNav } from "@/core/router/carNavContext";
 
 function CircularPlayBtn() {
     const progress = useProgress();
@@ -58,6 +59,7 @@ function CircularPlayBtn() {
     );
 }
 function MusicBar() {
+    const carNav = useCarNav();
     const musicItem = useCurrentMusic();
     const carMode = useCarMode();
 
@@ -79,6 +81,10 @@ function MusicBar() {
             hideSubscription.remove();
         };
     }, []);
+
+    if (carNav) {
+        return null;
+    }
 
     return (
         <>
